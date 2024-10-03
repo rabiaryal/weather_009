@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:weather_009/func/geolocator.dart';
+import 'package:weather_009/bloc/weather_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_009/extensions/enums.dart';
 
 import 'package:weather_009/models/jsonmodels.dart';
+import 'package:weather_009/repository/fetchcountry.dart';
 import 'package:weather_009/repository/weather_repository.dart';
 import 'package:weather_009/widgets/first_widgets.dart';
 import 'package:weather_009/widgets/searchwidgets.dart';
@@ -17,11 +20,7 @@ class Homepages extends StatefulWidget {
 
 class _HomepagesState extends State<Homepages> {
   WeatherRepository weatherRepository = WeatherRepository();
-
   Future<WeatherModel>? weatherData;
-  TextEditingController latController = TextEditingController();
-  TextEditingController lonController = TextEditingController();
-  Future<Position>? position;
   Position? _defaultPosition;
   String locationStatus = "Fetching location...";
 
@@ -40,79 +39,105 @@ class _HomepagesState extends State<Homepages> {
         locationStatus =
             'Default Location Set: (${position.latitude}, ${position.longitude})';
 
+        // Fetch weather data using the retrieved coordinates
         weatherData = weatherRepository.fetchWeathers(
-          position.latitude.toString(),
-          position.longitude.toString(),
+          position.latitude,
+          position.longitude,
         );
       });
     } catch (e) {
       setState(() {
         locationStatus = 'Error: $e';
       });
-
-      print('Error occurred while fetching location: $e');
     }
   }
 
-  // Update the weather information when the lat/lon changes
-  void updateWeatherData(String lat, String lon) {
-    setState(() {
-      weatherData = weatherRepository.fetchWeathers(lat, lon);
-    });
+  // Function to determine the device's current position
+  Future<Position> determinePosition() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permissions are denied');
+      }
+    }
+    return await Geolocator.getCurrentPosition();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("Weather"),
-        backgroundColor: Colors.amber,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: IconButton(
-              onPressed: () {
-                SecondDialog().showDialogAlertBox(context, updateWeatherData);
-              },
-              icon: const Icon(Icons.add),
+    return BlocProvider(
+      
+      create: (context) => WeatherBloc(
+        countryService: CountryService(),
+        weatherRepository: WeatherRepository(),
+      )..add(const LoadCountry()), // Load the list of countries on initialization
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text("Weather"),
+          backgroundColor: Colors.amber,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: IconButton(
+                onPressed: () {
+                  // Trigger fetching location-based weather
+                  initilizeLocation();
+                },
+                icon: const Icon(Icons.add),
+              ),
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CountrySearchBox(), // This will use the BLoC to fetch country data and handle selection
+                const SizedBox(height: 10),
+                BlocBuilder<WeatherBloc, WeatherStates>(
+                  builder: (context, state) {
+
+                     switch (state.postApiStatus) {
+      case PostApiStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case PostApiStatus.success:
+        if (state.weatherDetails != null) {
+          return WidgetsCollection1().BuildWidgets(state.weatherDetails!);
+        }
+        return const Center(child: Text("No Weather Data Available"));
+      case PostApiStatus.error:
+        return const Center(child: Text("Error fetching weather data, this is form the post Api statues"));
+      default:
+        return const Center(child: Text("Unknown state"));
+    }
+                    // if (state.postApiStatus == PostApiStatus.loading) {
+                    //   return const Center(
+                    //     child: CircularProgressIndicator(),
+                    //   );
+                    // } else if (state.postApiStatus == PostApiStatus.success && state.weatherDetails != null) {
+                    //   // Display the fetched weather details
+                    //   return WidgetsCollection1().BuildWidgets(state.weatherDetails!);
+                    // } else if (state.postApiStatus == PostApiStatus.error) {
+                    //   return const Center(child: Text("Error fetching weather data is due to postApistatus"));
+                    // } else {
+                    //   return const Center(child: Text("No Data Available"));
+                    // }
+                  },
+                ),
+              ],
             ),
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              
-              CountrySearchBox(),
-              const SizedBox(height: 10),
-              FutureBuilder<WeatherModel>(
-                future: weatherData,
-                builder: (context, snapshot) {
-                  // Checking if the snapshot is waiting or has an error
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    return WidgetsCollection1().BuildWidgets(snapshot.data!);
-                  } else {
-                    return const Center(child: Text("No Data Available"));
-                  }
-                },
-              ),
-            ],
-          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          initilizeLocation();
-        },
-        child: const Icon(Icons.refresh_outlined),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            initilizeLocation();
+          },
+          child: const Icon(Icons.refresh_outlined),
+        ),
       ),
     );
   }

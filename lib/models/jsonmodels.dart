@@ -13,20 +13,21 @@ class WeatherModel {
   String? _name;
   int? _cod;
 
-  WeatherModel(
-      {Coord? coord,
-      List<Weather>? weather,
-      String? base,
-      Main? main,
-      int? visibility,
-      Wind? wind,
-      Clouds? clouds,
-      int? dt,
-      Sys? sys,
-      int? timezone,
-      int? id,
-      String? name,
-      int? cod}) {
+  WeatherModel({
+    Coord? coord,
+    List<Weather>? weather,
+    String? base,
+    Main? main,
+    int? visibility,
+    Wind? wind,
+    Clouds? clouds,
+    int? dt,
+    Sys? sys,
+    int? timezone,
+    int? id,
+    String? name,
+    int? cod,
+  }) {
     if (coord != null) {
       this._coord = coord;
     }
@@ -96,21 +97,20 @@ class WeatherModel {
   set cod(int? cod) => _cod = cod;
 
   WeatherModel.fromJson(Map<String, dynamic> json) {
-    _coord = json['coord'] != null ? new Coord.fromJson(json['coord']) : null;
+    _coord = json['coord'] != null ? Coord.fromJson(json['coord']) : null;
     if (json['weather'] != null) {
       _weather = <Weather>[];
       json['weather'].forEach((v) {
-        _weather!.add(new Weather.fromJson(v));
+        _weather!.add(Weather.fromJson(v));
       });
     }
     _base = json['base'];
-    _main = json['main'] != null ? new Main.fromJson(json['main']) : null;
+    _main = json['main'] != null ? Main.fromJson(json['main']) : null;
     _visibility = json['visibility'];
-    _wind = json['wind'] != null ? new Wind.fromJson(json['wind']) : null;
-    _clouds =
-        json['clouds'] != null ? new Clouds.fromJson(json['clouds']) : null;
+    _wind = json['wind'] != null ? Wind.fromJson(json['wind']) : null;
+    _clouds = json['clouds'] != null ? Clouds.fromJson(json['clouds']) : null;
     _dt = json['dt'];
-    _sys = json['sys'] != null ? new Sys.fromJson(json['sys']) : null;
+    _sys = json['sys'] != null ? Sys.fromJson(json['sys']) : null;
     _timezone = json['timezone'];
     _id = json['id'];
     _name = json['name'];
@@ -118,32 +118,32 @@ class WeatherModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this._coord != null) {
-      data['coord'] = this._coord!.toJson();
+    final Map<String, dynamic> data = {};
+    if (_coord != null) {
+      data['coord'] = _coord!.toJson();
     }
-    if (this._weather != null) {
-      data['weather'] = this._weather!.map((v) => v.toJson()).toList();
+    if (_weather != null) {
+      data['weather'] = _weather!.map((v) => v.toJson()).toList();
     }
-    data['base'] = this._base;
-    if (this._main != null) {
-      data['main'] = this._main!.toJson();
+    data['base'] = _base;
+    if (_main != null) {
+      data['main'] = _main!.toJson();
     }
-    data['visibility'] = this._visibility;
-    if (this._wind != null) {
-      data['wind'] = this._wind!.toJson();
+    data['visibility'] = _visibility;
+    if (_wind != null) {
+      data['wind'] = _wind!.toJson();
     }
-    if (this._clouds != null) {
-      data['clouds'] = this._clouds!.toJson();
+    if (_clouds != null) {
+      data['clouds'] = _clouds!.toJson();
     }
-    data['dt'] = this._dt;
-    if (this._sys != null) {
-      data['sys'] = this._sys!.toJson();
+    data['dt'] = _dt;
+    if (_sys != null) {
+      data['sys'] = _sys!.toJson();
     }
-    data['timezone'] = this._timezone;
-    data['id'] = this._id;
-    data['name'] = this._name;
-    data['cod'] = this._cod;
+    data['timezone'] = _timezone;
+    data['id'] = _id;
+    data['name'] = _name;
+    data['cod'] = _cod;
     return data;
   }
 }
@@ -167,14 +167,14 @@ class Coord {
   set lat(double? lat) => _lat = lat;
 
   Coord.fromJson(Map<String, dynamic> json) {
-    _lon = json['lon'];
-    _lat = json['lat'];
+    _lon = (json['lon'] as num).toDouble(); // Ensure lon is double
+    _lat = (json['lat'] as num).toDouble(); // Ensure lat is double
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['lon'] = this._lon;
-    data['lat'] = this._lat;
+    final Map<String, dynamic> data = {};
+    data['lon'] = _lon;
+    data['lat'] = _lat;
     return data;
   }
 }
@@ -217,11 +217,11 @@ class Weather {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this._id;
-    data['main'] = this._main;
-    data['description'] = this._description;
-    data['icon'] = this._icon;
+    final Map<String, dynamic> data = {};
+    data['id'] = _id;
+    data['main'] = _main;
+    data['description'] = _description;
+    data['icon'] = _icon;
     return data;
   }
 }
@@ -236,15 +236,16 @@ class Main {
   int? _seaLevel;
   int? _grndLevel;
 
-  Main(
-      {double? temp,
-      double? feelsLike,
-      double? tempMin,
-      double? tempMax,
-      int? pressure,
-      int? humidity,
-      int? seaLevel,
-      int? grndLevel}) {
+  Main({
+    double? temp,
+    double? feelsLike,
+    double? tempMin,
+    double? tempMax,
+    int? pressure,
+    int? humidity,
+    int? seaLevel,
+    int? grndLevel,
+  }) {
     if (temp != null) {
       this._temp = temp;
     }
@@ -289,10 +290,10 @@ class Main {
   set grndLevel(int? grndLevel) => _grndLevel = grndLevel;
 
   Main.fromJson(Map<String, dynamic> json) {
-    _temp = json['temp'];
-    _feelsLike = json['feels_like'];
-    _tempMin = json['temp_min'];
-    _tempMax = json['temp_max'];
+    _temp = (json['temp'] as num).toDouble(); // Ensure temp is double
+    _feelsLike = (json['feels_like'] as num).toDouble(); // Ensure feelsLike is double
+    _tempMin = (json['temp_min'] as num).toDouble(); // Ensure tempMin is double
+    _tempMax = (json['temp_max'] as num).toDouble(); // Ensure tempMax is double
     _pressure = json['pressure'];
     _humidity = json['humidity'];
     _seaLevel = json['sea_level'];
@@ -300,15 +301,15 @@ class Main {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['temp'] = this._temp;
-    data['feels_like'] = this._feelsLike;
-    data['temp_min'] = this._tempMin;
-    data['temp_max'] = this._tempMax;
-    data['pressure'] = this._pressure;
-    data['humidity'] = this._humidity;
-    data['sea_level'] = this._seaLevel;
-    data['grnd_level'] = this._grndLevel;
+    final Map<String, dynamic> data = {};
+    data['temp'] = _temp;
+    data['feels_like'] = _feelsLike;
+    data['temp_min'] = _tempMin;
+    data['temp_max'] = _tempMax;
+    data['pressure'] = _pressure;
+    data['humidity'] = _humidity;
+    data['sea_level'] = _seaLevel;
+    data['grnd_level'] = _grndLevel;
     return data;
   }
 }
@@ -338,16 +339,16 @@ class Wind {
   set gust(double? gust) => _gust = gust;
 
   Wind.fromJson(Map<String, dynamic> json) {
-    _speed = json['speed'];
+    _speed = (json['speed'] as num).toDouble(); // Ensure speed is double
     _deg = json['deg'];
-    _gust = json['gust'];
+    _gust = (json['gust'] as num).toDouble(); // Ensure gust is double
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['speed'] = this._speed;
-    data['deg'] = this._deg;
-    data['gust'] = this._gust;
+    final Map<String, dynamic> data = {};
+    data['speed'] = _speed;
+    data['deg'] = _deg;
+    data['gust'] = _gust;
     return data;
   }
 }
@@ -369,8 +370,8 @@ class Clouds {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['all'] = this._all;
+    final Map<String, dynamic> data = {};
+    data['all'] = _all;
     return data;
   }
 }
@@ -420,12 +421,12 @@ class Sys {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this._type;
-    data['id'] = this._id;
-    data['country'] = this._country;
-    data['sunrise'] = this._sunrise;
-    data['sunset'] = this._sunset;
+    final Map<String, dynamic> data = {};
+    data['type'] = _type;
+    data['id'] = _id;
+    data['country'] = _country;
+    data['sunrise'] = _sunrise;
+    data['sunset'] = _sunset;
     return data;
   }
 }
