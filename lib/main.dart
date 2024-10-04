@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:weather_009/pages/homepages.dart';
+import 'package:weather_009/pages/firstpage.dart';
+import 'package:weather_009/pages/widgets/locationwidget.dart';
+import 'package:weather_009/test.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,19 +10,11 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home:const  Homepages(),
+      home:FirstPage(),
     );
   }
 }
-

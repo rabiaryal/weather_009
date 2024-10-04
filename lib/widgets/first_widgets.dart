@@ -5,9 +5,9 @@ import 'package:weather_009/repository/weather_repository.dart';
 class WidgetsCollection1 {
   WeatherRepository weatherRepository = WeatherRepository();
 
-  Widget textFormField(TextEditingController _controller, String name) {
+  Widget textFormField(TextEditingController controller, String name) {
     return TextFormField(
-      controller: _controller,
+      controller: controller,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         hintText: "Enter $name",
@@ -31,30 +31,30 @@ class WidgetsCollection1 {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Location: ${weather.name ?? 'Unknown'}', style: TextStyle(fontSize: 20)),
+          Text('Location: ${weather.name ?? 'Unknown'}', style: const TextStyle(fontSize: 20)),
           const SizedBox(height: 8),
           weather.weather != null && weather.weather!.isNotEmpty
-              ? Text('Weather: ${weather.weather![0].description ?? 'Unknown'}', style: TextStyle(fontSize: 18))
-              : Text('Weather: Unknown', style: TextStyle(fontSize: 18)),
+              ? Text('Weather: ${weather.weather![0].description ?? 'Unknown'}', style: const TextStyle(fontSize: 18))
+              : const Text('Weather: Unknown', style: TextStyle(fontSize: 18)),
           const SizedBox(height: 8),
           weather.main != null
               ? Text(
                   'Temperature: ${kelvinToCelsius(weather.main!.temp!).toStringAsFixed(1)}°C',
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                 )
-              : Text('Temperature: Unknown', style: TextStyle(fontSize: 18)),
+              : const Text('Temperature: Unknown', style: TextStyle(fontSize: 18)),
           const SizedBox(height: 8),
           weather.main != null
-              ? Text('Humidity: ${weather.main!.humidity}%', style: TextStyle(fontSize: 18))
-              : Text('Humidity: Unknown', style: TextStyle(fontSize: 18)),
+              ? Text('Humidity: ${weather.main!.humidity}%', style: const TextStyle(fontSize: 18))
+              : const Text('Humidity: Unknown', style: TextStyle(fontSize: 18)),
           const SizedBox(height: 8),
           weather.wind != null
-              ? Text('Wind Speed: ${weather.wind!.speed} m/s', style: TextStyle(fontSize: 18))
-              : Text('Wind Speed: Unknown', style: TextStyle(fontSize: 18)),
+              ? Text('Wind Speed: ${weather.wind!.speed} m/s', style: const TextStyle(fontSize: 18))
+              : const Text('Wind Speed: Unknown', style: TextStyle(fontSize: 18)),
           const SizedBox(height: 8),
           weather.clouds != null
-              ? Text('Cloudiness: ${weather.clouds!.all}%', style: TextStyle(fontSize: 18))
-              : Text('Cloudiness: Unknown', style: TextStyle(fontSize: 18)),
+              ? Text('Cloudiness: ${weather.clouds!.all}%', style: const TextStyle(fontSize: 18))
+              : const Text('Cloudiness: Unknown', style: TextStyle(fontSize: 18)),
         ],
       ),
     );

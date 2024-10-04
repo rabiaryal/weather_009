@@ -9,7 +9,6 @@ import 'package:weather_009/repository/fetchcountry.dart';
 import 'package:weather_009/repository/weather_repository.dart';
 import 'package:weather_009/widgets/first_widgets.dart';
 import 'package:weather_009/widgets/searchwidgets.dart';
-import 'package:weather_009/widgets/second_dialog.dart';
 
 class Homepages extends StatefulWidget {
   const Homepages({super.key});
@@ -114,18 +113,7 @@ class _HomepagesState extends State<Homepages> {
       default:
         return const Center(child: Text("Unknown state"));
     }
-                    // if (state.postApiStatus == PostApiStatus.loading) {
-                    //   return const Center(
-                    //     child: CircularProgressIndicator(),
-                    //   );
-                    // } else if (state.postApiStatus == PostApiStatus.success && state.weatherDetails != null) {
-                    //   // Display the fetched weather details
-                    //   return WidgetsCollection1().BuildWidgets(state.weatherDetails!);
-                    // } else if (state.postApiStatus == PostApiStatus.error) {
-                    //   return const Center(child: Text("Error fetching weather data is due to postApistatus"));
-                    // } else {
-                    //   return const Center(child: Text("No Data Available"));
-                    // }
+                    
                   },
                 ),
               ],

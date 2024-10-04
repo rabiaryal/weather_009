@@ -95,7 +95,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
   emit(state.copyWith(postApiStatus: PostApiStatus.loading));
   try {
     // Check if latitude and longitude are valid
-    if (event.latitude == null || event.longitude == null) {
+    if (event.longitude == null) {
       emit(state.copyWith(postApiStatus: PostApiStatus.error));
       print('Invalid latitude or longitude: $event');
       return;

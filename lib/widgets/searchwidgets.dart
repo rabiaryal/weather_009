@@ -6,6 +6,8 @@ import 'package:weather_009/bloc/weather_bloc.dart';
 import 'package:weather_009/extensions/enums.dart'; // Make sure the WeatherBloc is imported
 
 class CountrySearchBox extends StatefulWidget {
+  const CountrySearchBox({super.key});
+
   @override
   _CountrySearchBoxState createState() => _CountrySearchBoxState();
 }
@@ -69,7 +71,7 @@ class _CountrySearchBoxState extends State<CountrySearchBox> {
                   selectedItem: selectedCountry,
                 );
               } else {
-                return Text('Error loading countries');
+                return const Text('Error loading countries');
               }
             },
           ),
