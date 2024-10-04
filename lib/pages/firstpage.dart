@@ -1,22 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:weather_009/models/citymodel.dart';
+import 'package:weather_009/models/jsonmodels.dart';
+import 'package:weather_009/pages/search/search.dart';
 import 'package:weather_009/pages/widgets/datewidgets.dart';
 import 'package:weather_009/pages/widgets/displayweather.dart';
 import 'package:weather_009/pages/widgets/locationwidget.dart';
 import 'package:weather_009/pages/widgets/popupbutton.dart';
 import 'package:weather_009/pages/widgets/tempreature.dart';
 import 'package:weather_009/pages/widgets/weathertypes.dart';
+import 'package:weather_009/repository/weather_repository.dart';
 
 class FirstPage extends StatefulWidget {
-  const FirstPage({super.key});
+  City? selectedCity; // Nullable in case no city is passed initially
+
+  FirstPage({Key? key, this.selectedCity}) : super(key: key);
 
   @override
   State<FirstPage> createState() => _FirstPageState();
 }
 
 class _FirstPageState extends State<FirstPage> {
-  // Set the initial weather type
-  Weathertypes currentWeather = Weathertypes.snow;
+ 
+ Weathertypes currentWeather = Weathertypes.snow;
+  WeatherRepository weatherRepository = WeatherRepository();
+  double? temperature; // Store the fetched temperature
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selectedCity != null) {
+      fetchWeatherData(); // Fetch weather data if a city is selected
+    }
+  }
+
+  Future<void> fetchWeatherData() async {
+    if (widget.selectedCity != null) {
+      double latitude = widget.selectedCity!.latitude;
+      double longitude = widget.selectedCity!.longitude;
+
+      try {
+        WeatherModel weatherModel = await weatherRepository.fetchWeathers(latitude, longitude);
+        print(weatherModel); // Log the entire weather model to check the structure
+        setState(() {
+          temperature = weatherModel.main?.temp; // Check if this is the correct path
+        });
+      } catch (e) {
+        print('Error fetching weather data: $e');
+      }
+    }
+  }
+
+  void updateCityAndTemperature(double newTemperature, City city) {
+    setState(() {
+      temperature = newTemperature; // Update the temperature
+      widget.selectedCity = city; // Update the selected city
+    });
+  }
+
+  void showCitySearch() async {
+    final selectedCity = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CitySearch(onCitySelected: updateCityAndTemperature)), // Pass the callback here
+    );
+
+    if (selectedCity != null) {
+      // Update the state with the selected city
+      setState(() {
+        widget.selectedCity = selectedCity;
+        fetchWeatherData(); // Fetch weather for the newly selected city
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,55 +79,45 @@ class _FirstPageState extends State<FirstPage> {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        // Remove AppBar from Scaffold
-        extendBodyBehindAppBar: true, // Extend the body behind the status bar
+        extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            // Background Color Based on Weather Type
             Container(
               height: double.infinity,
               width: double.infinity,
               color: currentWeather.getBackgroundColor(),
             ),
-
-            // SafeArea widget ensures the UI doesn't overlap with system bars
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Custom AppBar-like Section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      // crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // IconButton(
-                        //   onPressed: () {
-                        //     // Functionality for back or menu button
-                        //   },
-                        //   icon:
-                        //       // const Icon(Icons.arrow_back, color: Colors.black),
-                        // ),
+
                         IconButton(
-                          onPressed: () {
-                            showPopupMenu(context);
-                          },
-                          icon:
-                              const Icon(Icons.more_vert, color: Colors.black),
+                          onPressed:  () {
+                          showPopupMenu(context, updateTemperature); // Pass the callback
+                        },
+                          icon: const Icon(Icons.more_vert, color: Colors.black),
                         ),
                       ],
                     ),
-
-                    // Body Content starts here
-                    const SizedBox(height: 5), // Spacer
-
-                    // Location and Weather Details
-                    const LocationWidgets(),
+                    const SizedBox(height: 5),
+                    if (widget.selectedCity != null)
+                      LocationWidgets(
+                        city: widget.selectedCity!.name,
+                        countryName: widget.selectedCity!.country,
+                      ),
                     const SizedBox(height: 10),
                     const DateWidgets(),
                     const SizedBox(height: 10),
-                    const TempreatureWidgets(),
+                    if (temperature != null) // Check if temperature is fetched
+                      TemperatureWidgets(
+                        temperature: temperature!, // Pass the fetched temperature
+                      ),
                     const SizedBox(height: 10),
                     DisplayWeatherTypes(weatherType: currentWeather),
                   ],

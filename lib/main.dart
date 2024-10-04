@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/pages/firstpage.dart';
-import 'package:weather_009/pages/widgets/locationwidget.dart';
-import 'package:weather_009/test.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +11,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    // Example city to pass to FirstPage
+    City selectedCity = City(
+      name: 'London',
+      country: 'UK',
+      latitude: 51.5074,
+      longitude: -0.1278,
+    );
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:FirstPage(),
+      home: FirstPage(selectedCity: selectedCity), // Passing the city to FirstPage
     );
   }
 }

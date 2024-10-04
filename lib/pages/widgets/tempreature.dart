@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
 
-class TempreatureWidgets extends StatelessWidget {
-  const TempreatureWidgets({super.key});
+class TemperatureWidgets extends StatelessWidget {
+  final double temperature; // Accept temperature as a double
+
+  const TemperatureWidgets(
+      {super.key,
+      required this.temperature}); // Constructor to accept temperature
 
   Widget getTemperature() {
-    return Math.tex(
-      r'25 \degree \text{C}', // Display temperature with degree symbol and Celsius
-      textStyle: TextStyle(fontSize: 100), // Base font size for the temperature
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          temperature.toStringAsFixed(
+              1), // Convert temperature to string with 1 decimal place
+          style: const TextStyle(fontSize: 70),
+        ),
+        const Text(
+          '°C', // Display the degree symbol for Celsius
+          style: TextStyle(fontSize: 50),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
-      width:300,
+      height: 200,
+      width: 300,
       child: getTemperature(),
-      // color: Colors.green,?
+      // Uncomment the following line if you want to have a background color for better visibility
+      // color: Colors.green,
     );
   }
 }
