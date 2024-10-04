@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:weather_009/pages/widgets/datewidgets.dart';
+import 'package:weather_009/pages/widgets/displayweather.dart';
 import 'package:weather_009/pages/widgets/locationwidget.dart';
 import 'package:weather_009/pages/widgets/popupbutton.dart';
 import 'package:weather_009/pages/widgets/tempreature.dart';
+import 'package:weather_009/pages/widgets/weathertypes.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -12,6 +14,9 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
+  // Set the initial weather type
+  Weathertypes currentWeather = Weathertypes.snow;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,43 +25,57 @@ class _FirstPageState extends State<FirstPage> {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          elevation: 0,
-          actions: [
-            IconButton(
-              onPressed: () {
-                showPopupMenu(context);
-              },
-              icon: const Icon(Icons.more_vert),
-            ),
-          ],
-        ),
+        // Remove AppBar from Scaffold
+        extendBodyBehindAppBar: true, // Extend the body behind the status bar
         body: Stack(
-          children: <Widget>[
+          children: [
+            // Background Color Based on Weather Type
             Container(
               height: double.infinity,
               width: double.infinity,
-              // decoration: const BoxDecoration(
-              //   image: DecorationImage(
-              //     image: AssetImage('assets/images/navyblue background.jpg'),
-              //     fit: BoxFit.cover,
-              //   ),
-              // ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+              color: currentWeather.getBackgroundColor(),
+            ),
+
+            // SafeArea widget ensures the UI doesn't overlap with system bars
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 80), // Added spacing below AppBar
-                    LocationWidgets(),
-                    SizedBox(
-                      height: 5,
+                    // Custom AppBar-like Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      // crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // IconButton(
+                        //   onPressed: () {
+                        //     // Functionality for back or menu button
+                        //   },
+                        //   icon:
+                        //       // const Icon(Icons.arrow_back, color: Colors.black),
+                        // ),
+                        IconButton(
+                          onPressed: () {
+                            showPopupMenu(context);
+                          },
+                          icon:
+                              const Icon(Icons.more_vert, color: Colors.black),
+                        ),
+                      ],
                     ),
-                    DateWidgets(),
-                    SizedBox(height: 5,),
-                    TempreatureWidgets(),
+
+                    // Body Content starts here
+                    const SizedBox(height: 5), // Spacer
+
+                    // Location and Weather Details
+                    const LocationWidgets(),
+                    const SizedBox(height: 10),
+                    const DateWidgets(),
+                    const SizedBox(height: 10),
+                    const TempreatureWidgets(),
+                    const SizedBox(height: 10),
+                    DisplayWeatherTypes(weatherType: currentWeather),
                   ],
                 ),
               ),

@@ -16,7 +16,7 @@ extension WeatherFunction on Weathertypes {
       case Weathertypes.cloudy:
         return 'It is cloudy with a chance of gloom.';
       case Weathertypes.rain:
-        return 'It is raining, bring an umbrella!';
+        return 'It is raining bring an umbrella!';
       case Weathertypes.snow:
         return 'Snow is falling, it\'s going to be chilly!';
     }
