@@ -42,7 +42,7 @@ class _HomepagesState extends State<Homepages> {
         weatherData = weatherRepository.fetchWeathers(
           position.latitude,
           position.longitude,
-        );
+        ) as Future<WeatherModel>?;
       });
     } catch (e) {
       setState(() {

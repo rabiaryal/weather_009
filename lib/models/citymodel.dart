@@ -1,21 +1,27 @@
 class City {
-  final String name;
-  final String country;
-  final double latitude;
-  final double longitude;
+  final String? name;
+  final String? country;
+  final double? latitude; // Nullable
+  final double? longitude; // Nullable
 
   City({
-    required this.name,
-    required this.country,
-    required this.latitude,
-    required this.longitude,
+    this.name,
+    this.country,
+    this.latitude,
+    this.longitude,
   });
-   factory City.fromJson(Map<String, dynamic> json) {
+
+  @override
+  String toString() {
+    return "$name, $country";
+  }
+
+  factory City.fromJson(Map<String, dynamic> json) {
     return City(
       name: json['name'],
       country: json['sys']['country'],
-      latitude: json['coord']['lat'],
-      longitude: json['coord']['lon'],
+      latitude: json['coord'] != null ? (json['coord']['lat'] as num).toDouble() : null, // Handle potential null
+      longitude: json['coord'] != null ? (json['coord']['lon'] as num).toDouble() : null, // Handle potential null
     );
   }
 }
