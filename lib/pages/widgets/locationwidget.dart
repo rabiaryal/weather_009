@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:weather_009/apptheme/apptheme.dart';
 
 class LocationWidgets extends StatelessWidget {
-  final String city;
-  final String countryName;
+  final String? city;
+  final String? countryName;
 
   const LocationWidgets({Key? key, required this.city, required this.countryName}) : super(key: key);
 
@@ -11,7 +11,7 @@ class LocationWidgets extends StatelessWidget {
     return const Icon(Icons.location_on, color: Colors.black);
   }
 
-  Widget location(String city, String countryName) {
+  Widget location(String? city, String? countryName) {
     return Expanded(
       child: Text(
         "$city, $countryName",

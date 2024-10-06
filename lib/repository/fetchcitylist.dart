@@ -12,42 +12,36 @@ class FetchCity {
 
   // Function to fetch cities and their weather info together
   Future<List<City>> fetchCitiesWithWeather(String query) async {
-    final String cityUrl =
-        '$baseUrl?q=$query&appid=$apiKey&units=metric&limit=10'; // Fetch cities and weather data at once
+  final String cityUrl =
+      '$baseUrl?q=$query&appid=$apiKey&units=metric&limit=10'; // Fetch cities
 
-    try {
-      // Debouncing: Check if a minimum time has passed since the last query
-      if (lastQueryTime != null &&
-          DateTime.now().difference(lastQueryTime!) < debounceDuration) {
-        return []; // Skip API call if the debounce condition isn't met
-      }
-      lastQueryTime = DateTime.now();
+  try {
+    // Fetch data from the API
+    final response = await http.get(Uri.parse(cityUrl));
 
-      // Fetch data from the API
-      final response = await http.get(Uri.parse(cityUrl));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print(data); // Check the API response in console
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print(data); // Check the API response in console
+      // Extract cities from the API response
+      if (data['list'] != null && data['list'] is List) {
+        List<City> cities = (data['list'] as List).map((cityJson) {
+          return City.fromJson(cityJson); // Parsing each city
+        }).toList();
 
-        // Extract cities and their weather data from API response
-        if (data['list'] != null && data['list'] is List) {
-          List<City> cities = (data['list'] as List).map((cityJson) {
-            return City.fromJson(cityJson); // Parsing each city
-          }).toList();
-
-          return cities; // Return the list of cities along with their weather data
-        } else {
-          return [];
-        }
+        return cities; // Return the list of cities
       } else {
-        print(
-            'Error fetching cities and weather data: ${response.statusCode}, ${response.body}');
-        throw Exception('Failed to fetch cities: ${response.statusCode}');
+        return []; // Return an empty list if no cities found
       }
-    } catch (e) {
-      print('Exception: $e');
-      throw Exception('Error fetching cities and weather data: $e');
+    } else {
+      print(
+          'Error fetching cities: ${response.statusCode}, ${response.body}');
+      throw Exception('Failed to fetch cities: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Exception: $e');
+    throw Exception('Error fetching cities: $e');
   }
+}
+
 }

@@ -17,32 +17,21 @@ class FetchCityEvent extends WeatherEvent {
   List<Object?> get props => [query];
 }
 
-class SelectCityEvent extends WeatherEvent {
-  final City selectedCity;  // Ensure this is the correct type
-
-  SelectCityEvent({required this.selectedCity});
-
-  @override
-  List<Object?> get props => [selectedCity];
-}
-
-
 // Event to select a city
-class SelectCity extends WeatherEvent {
+class SelectCityEvent extends WeatherEvent {
   final City selectedCity;
 
-  const SelectCity({required this.selectedCity});
+  const SelectCityEvent({required this.selectedCity});
 
   @override
   List<Object?> get props => [selectedCity];
 }
-
 
 // Event to fetch weather data for a selected city
-class WeatherApi extends WeatherEvent {
+class FetchWeatherEvent extends WeatherEvent {
   final City selectedCity;
 
-  const WeatherApi({required this.selectedCity});
+  const FetchWeatherEvent({required this.selectedCity});
 
   @override
   List<Object?> get props => [selectedCity];

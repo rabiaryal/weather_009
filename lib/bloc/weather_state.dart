@@ -42,5 +42,4 @@ class WeatherStates extends Equatable {
       ];
 }
 
-// Define the possible states for API requests
-enum PostApiStatus { initial, loading, success, error }
+

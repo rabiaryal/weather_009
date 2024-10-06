@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_009/extensions/enums.dart';
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/pages/widgets/datewidgets.dart';
 import 'package:weather_009/pages/widgets/displayweather.dart';
@@ -9,14 +10,10 @@ import 'package:weather_009/pages/widgets/tempreature.dart';
 import 'package:weather_009/pages/widgets/weathertypes.dart';
 import 'package:weather_009/bloc/weather_bloc.dart';
 
-
-
 class FirstPage extends StatefulWidget {
+  final City selectedCity;
 
-    final City selectedCity; // Add a field for selectedCity
-
-  const FirstPage({Key? key, required this.selectedCity}) : super(key: key); 
- 
+  const FirstPage({Key? key, required this.selectedCity}) : super(key: key);
 
   @override
   State<FirstPage> createState() => _FirstPageState();
@@ -26,23 +23,34 @@ class _FirstPageState extends State<FirstPage> {
   Weathertypes currentWeather = Weathertypes.snow;
 
   @override
+  void initState() {
+    super.initState();
+    // Dispatch an event to fetch the weather details when the widget is initialized
+    context
+        .read<WeatherBloc>()
+        .add(FetchWeatherEvent(selectedCity: widget.selectedCity));
+    // context.read<WeatherBloc>().add(FetchCityEvent(query: "Kathmandu"));// Ensure correct event is used
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<WeatherBloc, WeatherStates>(
       builder: (context, state) {
-        if (state.postApiStatus ==PostApiStatus.loading) {
+        if (state.postApiStatus == PostApiStatus.loading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state.postApiStatus ==PostApiStatus.success && state.weatherDetails != null) {
+        } else if (state.postApiStatus == PostApiStatus.success &&
+            state.weatherDetails != null) {
           final weather = state.weatherDetails!;
-          final temperature = weather.temp; // Assuming temp is part of main
-          final city = state.selectedCity?.name ?? "Unknown City";
-          final country = state.selectedCity?.country ?? "Unknown Country";
+          final temperature = weather.temp;
+          final city = widget.selectedCity.name;
+          final country = widget.selectedCity.country;
 
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
-            home: Scaffold(   
+            home: Scaffold(
               extendBodyBehindAppBar: true,
               body: Stack(
                 children: [
@@ -64,7 +72,8 @@ class _FirstPageState extends State<FirstPage> {
                                 onPressed: () {
                                   showPopupMenu(context);
                                 },
-                                icon: const Icon(Icons.more_vert, color: Colors.black),
+                                icon: const Icon(Icons.more_vert,
+                                    color: Colors.black),
                               ),
                             ],
                           ),
@@ -74,7 +83,7 @@ class _FirstPageState extends State<FirstPage> {
                           const SizedBox(height: 10),
                           const DateWidgets(),
                           const SizedBox(height: 10),
-                          TemperatureWidgets(temperature: temperature), // Pass temperature
+                          TemperatureWidgets(temperature: temperature),
                           const SizedBox(height: 10),
                           Descriptionweathers(weatherType: currentWeather),
                         ],

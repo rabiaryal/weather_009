@@ -1,8 +1,8 @@
 class City {
   final String? name;
   final String? country;
-  final double? latitude; // Nullable
-  final double? longitude; // Nullable
+  final double? latitude;
+  final double? longitude;
 
   City({
     this.name,
@@ -11,17 +11,19 @@ class City {
     this.longitude,
   });
 
+  // Improved toString method to handle null values gracefully
   @override
   String toString() {
-    return "$name, $country";
+    return "${name ?? 'Unknown City'}, ${country ?? 'Unknown Country'}";
   }
 
+  // Factory constructor to create a City instance from a JSON map
   factory City.fromJson(Map<String, dynamic> json) {
     return City(
-      name: json['name'],
-      country: json['sys']['country'],
-      latitude: json['coord'] != null ? (json['coord']['lat'] as num).toDouble() : null, // Handle potential null
-      longitude: json['coord'] != null ? (json['coord']['lon'] as num).toDouble() : null, // Handle potential null
+      name: json['name'], // Assume 'name' might be null in some cases
+      country: json['sys'] != null ? json['sys']['country'] : 'Unknown Country', // Handle missing country data
+      latitude: json['coord'] != null ? (json['coord']['lat'] as num?)?.toDouble() : null, // Safely convert to double
+      longitude: json['coord'] != null ? (json['coord']['lon'] as num?)?.toDouble() : null, // Safely convert to double
     );
   }
 }
