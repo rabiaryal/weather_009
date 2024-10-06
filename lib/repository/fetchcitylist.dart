@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:weather_009/models/citymodel.dart';
 
 class FetchCity {
-  final String apiKey = 'a99b3b9a23adbd96f8b702b674b448e5';
+  final String apiKey = '12345'; // Add your API key
+
+ 
   final String baseUrl = 'https://api.openweathermap.org/data/2.5/find';
 
   // Debounce mechanism (optional)
