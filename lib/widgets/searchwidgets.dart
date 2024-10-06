@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:weather_009/bloc/weather_bloc.dart';
-import 'package:weather_009/extensions/enums.dart'; // Make sure the WeatherBloc is imported
+import 'package:weather_009/bloc/weather_bloc.dart'; // Ensure WeatherBloc is imported
+import 'package:weather_009/models/citymodel.dart'; // Ensure City model is imported
 
-class CountrySearchBox extends StatefulWidget {
-  const CountrySearchBox({super.key});
+class CitySearchBox extends StatefulWidget {
+  const CitySearchBox({super.key});
 
   @override
-  _CountrySearchBoxState createState() => _CountrySearchBoxState();
+  _CitySearchBoxState createState() => _CitySearchBoxState();
 }
 
-class _CountrySearchBoxState extends State<CountrySearchBox> {
-  String? selectedCountry;
+class _CitySearchBoxState extends State<CitySearchBox> {
+  City? selectedCity; // Changed from String? to City?
 
   @override
   void initState() {
     super.initState();
-   context.read<WeatherBloc>().add(const FetchCountries());
-
+    // You can initiate a fetch event here if needed
   }
 
   @override
@@ -33,51 +31,43 @@ class _CountrySearchBoxState extends State<CountrySearchBox> {
             builder: (context, state) {
               if (state.postApiStatus == PostApiStatus.loading) {
                 return const CircularProgressIndicator(); // Show loading indicator while data is being fetched
-              } else if (state.postApiStatus == PostApiStatus.success &&
-                  state.countries != null) {
-                return DropdownSearch<String>(
-                  items: state.countries!.map((e) => e.countryname).toList(),
-                  popupProps: const PopupProps.dialog(
+              } else if (state.postApiStatus == PostApiStatus.success && state.cities != null) {
+                return DropdownSearch<City>(
+                  items: state.cities, // Assuming this is a list of City objects
+                  popupProps: PopupProps.dialog(
                     showSearchBox: true, // Enables the search bar
                     searchFieldProps: TextFieldProps(
                       decoration: InputDecoration(
+                        labelText: "Search for a city", // Label for the search field
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        labelText:
-                            "Search country", // Placeholder text in search bar
                       ),
                     ),
                   ),
                   dropdownDecoratorProps: const DropDownDecoratorProps(
                     dropdownSearchDecoration: InputDecoration(
-                      labelText: "Select a country",
-                      hintText: "Choose a country",
+                      labelText: "Select a city",
+                      hintText: "Choose a city",
                     ),
                   ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedCountry = newValue;
-                    });
-
-                    // Dispatch an event to handle the selected country
-                    context.read<WeatherBloc>().add(
-                          SelectCountry(
-                            selectedCountry: state.countries!.firstWhere(
-                                (country) => country.countryname == newValue),
-                          ),
-                        );
+                  onChanged: (City? newValue) { // Ensure this is a City type
+                    if (newValue != null) {
+                      selectedCity = newValue; // Update selectedCity with the selected City object
+                      // Pass the selected city object to the event
+                      context.read<WeatherBloc>().add(SelectCityEvent(selectedCity: newValue));
+                    }
                   },
-                  selectedItem: selectedCountry,
+                  selectedItem: selectedCity, // Show the currently selected city
                 );
               } else {
-                return const Text('Error loading countries');
+                return const Text('Error loading cities');
               }
             },
           ),
           const SizedBox(height: 20),
-          if (selectedCountry != null)
-            Text('Selected Country: $selectedCountry'),
+          if (selectedCity != null) // Display the selected city's name and country
+            Text('Selected City: ${selectedCity.toString()}'),
         ],
       ),
     );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:weather_009/fortest/page01.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_009/bloc/weather_bloc.dart'; // Import your WeatherBloc
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/pages/firstpage.dart';
-import 'package:weather_009/pages/homepages.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,9 +21,12 @@ class MyApp extends StatelessWidget {
       longitude: -0.1278,
     );
 
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: NextHome() // Passing the city to FirstPage
+    return BlocProvider(
+      create: (context) => WeatherBloc(), // Provide your WeatherBloc here
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: FirstPage(selectedCity: selectedCity), // Pass the city to FirstPage
+      ),
     );
   }
 }

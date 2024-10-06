@@ -7,35 +7,43 @@ abstract class WeatherEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class SelectCountry extends WeatherEvent {
-  final Country selectedCountry;
+// Event to fetch cities based on a query
+class FetchCityEvent extends WeatherEvent {
+  final String query;
 
-  const SelectCountry({required this.selectedCountry});
-
-  @override
-  List<Object?> get props => [selectedCountry];
-}
-
-class FetchCountries extends WeatherEvent {
-  const FetchCountries();
-}
-
-class LoadCountry extends WeatherEvent {
-  final List<Country> countries;
-
-  const LoadCountry({this.countries = const []});
+  FetchCityEvent({required this.query});
 
   @override
-  List<Object?> get props => [countries];
+  List<Object?> get props => [query];
 }
 
-// Ensure latitude and longitude are double
+class SelectCityEvent extends WeatherEvent {
+  final City selectedCity;  // Ensure this is the correct type
+
+  SelectCityEvent({required this.selectedCity});
+
+  @override
+  List<Object?> get props => [selectedCity];
+}
+
+
+// Event to select a city
+class SelectCity extends WeatherEvent {
+  final City selectedCity;
+
+  const SelectCity({required this.selectedCity});
+
+  @override
+  List<Object?> get props => [selectedCity];
+}
+
+
+// Event to fetch weather data for a selected city
 class WeatherApi extends WeatherEvent {
-  final double latitude; // Changed to double
-  final double longitude; // Changed to double
+  final City selectedCity;
 
-  const WeatherApi({required this.latitude, required this.longitude});
+  const WeatherApi({required this.selectedCity});
 
   @override
-  List<Object?> get props => [latitude, longitude];
+  List<Object?> get props => [selectedCity];
 }

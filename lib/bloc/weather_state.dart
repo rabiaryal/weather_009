@@ -1,52 +1,46 @@
+
 part of 'weather_bloc.dart';
 
 class WeatherStates extends Equatable {
-  const WeatherStates({
-    this.postApiStatus = PostApiStatus.initial,
-    this.countryName = '',
-    this.flagUrl = '',
-    this.latitude,
-    this.longitude,
-    this.countries,
-    this.weatherDetails,
-  });
-
   final PostApiStatus postApiStatus;
-  final String? countryName;
-  final String? flagUrl;
-  final double? latitude; // Changed to double
-  final double? longitude; // Changed to double
-  final WeatherModel? weatherDetails;
-  final List<Country>? countries;
+  final List<City> cities; // Changed to a non-nullable List<City>
+  final City? selectedCity;
+  final WeatherSummary? weatherDetails; // Updated to use WeatherSummary
+  final String? errorMessage;
+
+  WeatherStates({
+    this.postApiStatus = PostApiStatus.initial,
+    List<City>? cities, // Allow it to be passed as nullable
+    this.selectedCity,
+    this.weatherDetails, // Updated to use WeatherSummary
+    this.errorMessage,
+  }) : cities = cities ?? []; // Initialize to an empty list if null
 
   WeatherStates copyWith({
     PostApiStatus? postApiStatus,
-    String? countryName,
-    String? flagUrl,
-    double? latitude, // Changed to double
-    double? longitude, // Changed to double
-    WeatherModel? weatherDetails,
-    List<Country>? countries,
+    List<City>? cities,
+    City? selectedCity,
+    WeatherSummary? weatherDetails, // Updated to use WeatherSummary
+    String? errorMessage,
   }) {
     return WeatherStates(
       postApiStatus: postApiStatus ?? this.postApiStatus,
-      countryName: countryName ?? this.countryName,
-      flagUrl: flagUrl ?? this.flagUrl,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      weatherDetails: weatherDetails ?? this.weatherDetails,
-      countries: countries ?? this.countries,
+      cities: cities ?? this.cities, // This will never be null
+      selectedCity: selectedCity ?? this.selectedCity,
+      weatherDetails: weatherDetails ?? this.weatherDetails, // Updated to use WeatherSummary
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
   List<Object?> get props => [
         postApiStatus,
-        countryName,
-        flagUrl,
-        latitude,
-        longitude,
-        weatherDetails,
-        countries,
+        cities, // This is now guaranteed to be non-null
+        selectedCity,
+        weatherDetails, // Updated to use WeatherSummary
+        errorMessage,
       ];
 }
+
+// Define the possible states for API requests
+enum PostApiStatus { initial, loading, success, error }

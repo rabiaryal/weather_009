@@ -26,8 +26,8 @@ class LocationWidgets extends StatelessWidget {
     return Row(
       children: [
         locationIcon(),
-        const SizedBox(width: 8), // Space between icon and text
-        location(city, countryName), // Use city and countryName from the constructor
+        const SizedBox(width: 8),
+        location(city, countryName),
       ],
     );
   }

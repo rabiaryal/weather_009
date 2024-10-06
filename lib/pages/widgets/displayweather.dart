@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:weather_009/pages/widgets/weathertypes.dart';
 
-class DisplayWeatherTypes extends StatelessWidget {
-  const DisplayWeatherTypes({Key? key, required this.weatherType})
+class Descriptionweathers extends StatelessWidget {
+  const Descriptionweathers({Key? key, required this.weatherType})
       : super(key: key);
 
   final Weathertypes weatherType;
@@ -29,7 +29,8 @@ class DisplayWeatherTypes extends StatelessWidget {
           const SizedBox(width: 10), // Space between icon and text
           Flexible(
             child: Text(
-              weatherType.getDescription(), // Get the description based on the weather type
+              weatherType
+                  .getDescription(), // Get the description based on the weather type
               style: const TextStyle(fontSize: 16),
               maxLines: 2, // Maximum number of lines the text can take
               overflow: TextOverflow.ellipsis, // Shows "..." if it overflows

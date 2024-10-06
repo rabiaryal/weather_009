@@ -1,122 +1,98 @@
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-// import 'package:flutter/material.dart';
-import 'package:weather_009/extensions/enums.dart';
-import 'package:weather_009/models/countrymodel.dart';
-import 'package:weather_009/models/jsonmodels.dart';
-import 'package:weather_009/repository/fetchcountry.dart';
+import 'package:weather_009/models/citymodel.dart';
+import 'package:weather_009/models/weathermode.dart';
+import 'package:weather_009/repository/fetchcitylist.dart';
 import 'package:weather_009/repository/weather_repository.dart';
+import 'package:http/http.dart' as http;
 
+// Import event and state parts
 part 'weather_event.dart';
 part 'weather_state.dart';
 
-
-
-
-
 class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
-  final CountryService countryService;
-  final WeatherRepository weatherRepository;
+  final FetchCity fetchCity = FetchCity();
+  final WeatherRepository weatherRepository = WeatherRepository();
 
-  WeatherBloc({
-    required this.weatherRepository,
-    required this.countryService,
-  }) : super(const WeatherStates()) {
-    on<FetchCountries>(_onFetchCountries);
-    on<LoadCountry>(_onLoadCountry);
-    on<SelectCountry>(_onSelectCountry);
-    on<WeatherApi>(_onfetchWeather);
+  WeatherBloc() : super( WeatherStates()) {
+    on<FetchCityEvent>(_onFetchCity);
+    on<SelectCityEvent>(_onSelectCity);  // Ensure this matches the event name
+    on<WeatherApi>(_onFetchWeather);
   }
 
-  Future<void> _onFetchCountries(
-    FetchCountries event,
+  // Fetch cities based on search query
+  Future<void> _onFetchCity(
+    FetchCityEvent event,
     Emitter<WeatherStates> emit,
   ) async {
     emit(state.copyWith(postApiStatus: PostApiStatus.loading));
+
     try {
-      final countries = await countryService.fetchCountries();
-      emit(state.copyWith(
-        postApiStatus: PostApiStatus.success,
-        countries: countries,
-      ));
-    } catch (e) {
-      print('Error fetching countries: $e');
-      emit(state.copyWith(postApiStatus: PostApiStatus.error));
-    }
-  }
+      // Fetch cities with weather data using the query provided in the event
+      List<City> cities = await fetchCity.fetchCitiesWithWeather(event.query);
 
-  Future<void> _onLoadCountry(
-    LoadCountry event,
-    Emitter<WeatherStates> emit,
-  ) async {
-    emit(state.copyWith(
-      postApiStatus: PostApiStatus.success,
-      countries: event.countries,
-    ));
-  }
-
-  Future<void> _onSelectCountry(
-    SelectCountry event,
-    Emitter<WeatherStates> emit,
-  ) async {
-    emit(state.copyWith(postApiStatus: PostApiStatus.loading));
-    try {
-      final selectedCountry = event.selectedCountry;
-      final lat = selectedCountry.latitude;
-      final lon = selectedCountry.longitude;
-
-      // Check if lat and lon are valid
-      if (lat == null || lon == null) {
-        print('Invalid latitude or longitude');
-        emit(state.copyWith(postApiStatus: PostApiStatus.error));
-        return;
+      if (cities.isNotEmpty) {
+        emit(state.copyWith(
+          postApiStatus: PostApiStatus.success,
+          cities: cities,
+        ));
+      } else {
+        emit(state.copyWith(
+          postApiStatus: PostApiStatus.error,
+          errorMessage: 'No cities found.',
+        ));
       }
-
-      emit(state.copyWith(
-        countryName: selectedCountry.countryname,
-        flagUrl: selectedCountry.flagUrl,
-        latitude: lat,
-        longitude: lon,
-        postApiStatus: PostApiStatus.success,
-      ));
-
-      // Trigger fetching weather using the selected country's latitude/longitude
-      add(WeatherApi(latitude: lat, longitude: lon));
     } catch (e) {
-      print('Error selecting country: $e');
-      emit(state.copyWith(postApiStatus: PostApiStatus.error));
+      print('Error fetching cities: $e');
+      emit(state.copyWith(
+        postApiStatus: PostApiStatus.error,
+        errorMessage: 'Error fetching cities: $e',
+      ));
     }
   }
 
-  Future<void> _onfetchWeather(
-  WeatherApi event,
+  // Handle city selection from the dropdown
+  // Handle city selection from the dropdown
+Future<void> _onSelectCity(
+  SelectCityEvent event,
   Emitter<WeatherStates> emit,
 ) async {
-  emit(state.copyWith(postApiStatus: PostApiStatus.loading));
-  try {
-    // Check if latitude and longitude are valid
-    if (event.longitude == null) {
-      emit(state.copyWith(postApiStatus: PostApiStatus.error));
-      print('Invalid latitude or longitude: $event');
-      return;
-    }
+  final selectedCity = event.selectedCity; // Make sure this is a City object
 
-    print('Fetching weather for lat: ${event.latitude}, lon: ${event.longitude}');
-    final weatherDetails = await weatherRepository.fetchWeathers(
-      event.latitude,
-      event.longitude,
-    );
+  emit(state.copyWith(
+    selectedCity: selectedCity,
+    postApiStatus: PostApiStatus.success,
+  ));
 
-    emit(state.copyWith(
-      weatherDetails: weatherDetails,
-      postApiStatus: PostApiStatus.success,
-    ));
-  } catch (e) {
-    print('Error fetching weather data: $e');
-    emit(state.copyWith(postApiStatus: PostApiStatus.error));
-  }
+  // Once a city is selected, fetch weather data for that city
+  add(WeatherApi(selectedCity: selectedCity));
 }
 
 
-  
+  // Fetch weather for the selected city (using city name)
+  Future<void> _onFetchWeather(
+    WeatherApi event,
+    Emitter<WeatherStates> emit,
+  ) async {
+    emit(state.copyWith(postApiStatus: PostApiStatus.loading));
+
+    try {
+      // Fetch weather based on city name
+      City city = event.selectedCity;
+      String cityName = city.name ?? 'Unknown City';
+      
+      WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(cityName);
+      emit(state.copyWith(
+        weatherDetails: weatherDetails,
+        postApiStatus: PostApiStatus.success,
+      ));
+    } catch (e) {
+      print('Error fetching weather data: $e');
+      emit(state.copyWith(
+        postApiStatus: PostApiStatus.error,
+        errorMessage: 'Error fetching weather data: $e',
+      ));
+    }
+  }
 }

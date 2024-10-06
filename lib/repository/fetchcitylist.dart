@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:weather_009/models/citymodel.dart';
-import 'package:weather_009/models/weathermode.dart'; // Import your WeatherSummary model
 
 class FetchCity {
   final String apiKey = 'a99b3b9a23adbd96f8b702b674b448e5';
