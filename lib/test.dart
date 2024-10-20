@@ -19,19 +19,19 @@ class TemperatureWidget extends StatelessWidget {
           ),
         ),
         // Degree Celsius Symbol
-        Column(
+        const Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               '°', // Degree symbol
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 40, // Smaller font size for degree symbol
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               'C', // Celsius symbol
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 30, // Smaller font size for 'C'
                 fontWeight: FontWeight.bold,
               ),

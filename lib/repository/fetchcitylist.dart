@@ -8,7 +8,7 @@ class FetchCity {
   final String baseUrl = 'https://api.openweathermap.org/data/2.5/find';
 
   // Debounce mechanism (optional)
-  Duration debounceDuration = Duration(milliseconds: 300);
+  Duration debounceDuration = const Duration(milliseconds: 300);
   DateTime? lastQueryTime;
 
   // Function to fetch cities and their weather info together

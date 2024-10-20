@@ -14,7 +14,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response =
-          await http.get(Uri.parse(url)).timeout(Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
       responseJson = returnResponse(response);
     } on SocketException {
@@ -31,7 +31,7 @@ class NetworkApiServices extends BaseApiServices {
       Response response = await post(
         Uri.parse(url),
         body: data,
-      ).timeout(Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 10));
 
       responseJson = returnResponse(response);
     } on SocketException {
@@ -55,8 +55,7 @@ class NetworkApiServices extends BaseApiServices {
 
       default:
         throw FetchException(
-          'Error Occured while communitating with server' +
-              'With Status code' +
+          'Error Occured while communitating with server' 'With Status code' +
               response.statusCode.toString(),
         );
     }

@@ -23,7 +23,7 @@ class TemperatureWidgets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 200,
       width: 300,
       child: getTemperature(),

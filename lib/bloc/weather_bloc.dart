@@ -1,99 +1,115 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:weather_009/res/extensions/enums.dart';
-import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/models/weathermode.dart';
-import 'package:weather_009/repository/fetchcitylist.dart';
+import 'package:weather_009/models/countrymodel.dart'; // Country model
+import 'package:weather_009/repository/fetchcountry.dart';
 import 'package:weather_009/repository/weather_repository.dart';
-
+import 'package:weather_009/res/extensions/enums.dart';
 
 // Import event and state parts
 part 'weather_event.dart';
 part 'weather_state.dart';
 
 class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
-  final FetchCity fetchCity = FetchCity();
-  final WeatherRepository weatherRepository = WeatherRepository();
+  final WeatherRepository weatherRepository;
+  final CountryService countryService;
 
-  WeatherBloc() : super(WeatherStates()) {
-    on<FetchCityEvent>(_onFetchCity);
-    on<SelectCityEvent>(_onSelectCity);  
-    on<FetchWeatherEvent>(_onFetchWeather);  // Renamed to FetchWeatherEvent for clarity
+  WeatherBloc({
+    required this.weatherRepository,
+    required this.countryService,
+  }) : super(const WeatherStates()) {
+    on<FetchCountryEvent>(_onFetchCountry);
+    on<SelectCountryEvent>(_onSelectCountry);
+    on<FetchWeatherEvent>(_onFetchWeather); // Added FetchWeatherEvent handler
   }
 
-  // Fetch cities based on search query
-  Future<void> _onFetchCity(
-    FetchCityEvent event,
+  // Fetch countries from the API
+  Future<void> _onFetchCountry(
+    FetchCountryEvent event,
     Emitter<WeatherStates> emit,
   ) async {
     emit(state.copyWith(postApiStatus: PostApiStatus.loading));
 
     try {
-      List<City> cities = await fetchCity.fetchCitiesWithWeather(event.query);
-      print("Fetched Cities: ${cities.map((city) => city.name).toList()}");
+      List<Country> countries = await countryService.fetchCountries();
+      print("Fetched Countries: ${countries.map((country) => country.countryname).toList()}");
 
-      if (cities.isNotEmpty) {
-        emit(state.copyWith(
-          postApiStatus: PostApiStatus.success,
-          cities: cities,
-        ));
-      } else {
-        print('No cities found for query: ${event.query}');
-        emit(state.copyWith(
-          postApiStatus: PostApiStatus.error,
-          errorMessage: 'No cities found.',
-        ));
-      }
+      emit(state.copyWith(
+        postApiStatus: PostApiStatus.success,
+        countries: countries,
+      ));
     } catch (e) {
-      print('Error fetching cities: $e');
+      print('Error fetching countries: $e');
       emit(state.copyWith(
         postApiStatus: PostApiStatus.error,
-        errorMessage: 'Error fetching cities: $e',
+        errorMessage: 'Error fetching countries: $e',
       ));
     }
   }
 
-  // Handle city selection
+  // Handle country selection and fetch weather
+  Future<void> _onSelectCountry(
+    SelectCountryEvent event,
+    Emitter<WeatherStates> emit,
+  ) async {
+    final selectedCountry = event.selectedCountry;
 
-
-  Future<void> _onSelectCity(
-  SelectCityEvent event,
-  Emitter<WeatherStates> emit,
-) async {
-  final selectedCity = event.selectedCity;
-
-  emit(state.copyWith(
-    selectedCity: selectedCity,
-    postApiStatus: PostApiStatus.success,
-  ));
-
-  // Once a city is selected, fetch weather data for that city
-  add(FetchWeatherEvent(selectedCity: selectedCity)); // Correct event
-}
-Future<void> _onFetchWeather(
-  FetchWeatherEvent event, // Correct event name
-  Emitter<WeatherStates> emit,
-) async {
-  emit(state.copyWith(postApiStatus: PostApiStatus.loading));
-
-  try {
-    City city = event.selectedCity;
-    String cityName = city.name ?? 'Unknown City'; // Handle null case
-
-    WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(cityName);
     emit(state.copyWith(
-      weatherDetails: weatherDetails,
+      selectedCountry: selectedCountry,
       postApiStatus: PostApiStatus.success,
     ));
-  } catch (e) {
-    print('Error fetching weather data: $e');
-    emit(state.copyWith(
-      postApiStatus: PostApiStatus.error,
-      errorMessage: 'Error fetching weather data: $e',
-    ));
-  }
-}
 
- 
+    // Fetch weather for the selected country
+    await _fetchWeatherForCountry(selectedCountry, emit);
+  }
+
+  // Fetch weather based on selected country's latitude and longitude
+  Future<void> _fetchWeatherForCountry(Country selectedCountry, Emitter<WeatherStates> emit) async {
+    emit(state.copyWith(postApiStatus: PostApiStatus.loading));
+
+    try {
+      // Pass latitude and longitude directly as double
+      WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(
+        selectedCountry.latitude,
+        selectedCountry.longitude,
+      );
+      
+      emit(state.copyWith(
+        weatherDetails: weatherDetails,
+        postApiStatus: PostApiStatus.success,
+      ));
+    } catch (e) {
+      print('Error fetching weather data: $e');
+      emit(state.copyWith(
+        postApiStatus: PostApiStatus.error,
+        errorMessage: 'Error fetching weather data: $e',
+      ));
+    }
+  }
+
+  // Fetch weather using latitude and longitude from the event
+  Future<void> _onFetchWeather(
+    FetchWeatherEvent event,
+    Emitter<WeatherStates> emit,
+  ) async {
+    emit(state.copyWith(postApiStatus: PostApiStatus.loading));
+
+    try {
+      WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(
+        event.latitude.toString(),
+        event.longitude,
+      );
+
+      emit(state.copyWith(
+        weatherDetails: weatherDetails,
+        postApiStatus: PostApiStatus.success,
+      ));
+    } catch (e) {
+      print('Error fetching weather data: $e');
+      emit(state.copyWith(
+        postApiStatus: PostApiStatus.error,
+        errorMessage: 'Error fetching weather data: $e',
+      ));
+    }
+  }
 }

@@ -7,32 +7,31 @@ abstract class WeatherEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Event to fetch cities based on a query
-class FetchCityEvent extends WeatherEvent {
-  final String query;
-
-  FetchCityEvent({required this.query});
+// Event to fetch countries
+class FetchCountryEvent extends WeatherEvent {
+  const FetchCountryEvent();
 
   @override
-  List<Object?> get props => [query];
+  List<Object?> get props => [];
 }
 
-// Event to select a city
-class SelectCityEvent extends WeatherEvent {
-  final City selectedCity;
+// Event to select a country
+class SelectCountryEvent extends WeatherEvent {
+  final Country selectedCountry;
 
-  const SelectCityEvent({required this.selectedCity});
+  const SelectCountryEvent({required this.selectedCountry});
 
   @override
-  List<Object?> get props => [selectedCity];
+  List<Object?> get props => [selectedCountry];
 }
 
-// Event to fetch weather data for a selected city
+// Event to fetch weather based on the selected country's coordinates
 class FetchWeatherEvent extends WeatherEvent {
-  final City selectedCity;
+  final double latitude;  // Use latitude as a double
+  final double longitude; // Use longitude as a double
 
-  const FetchWeatherEvent({required this.selectedCity});
+  const FetchWeatherEvent({required this.latitude, required this.longitude});
 
   @override
-  List<Object?> get props => [selectedCity];
+  List<Object?> get props => [latitude, longitude];
 }

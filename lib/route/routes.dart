@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:weather_009/route/route_name.dart';
 
 
 class Routes {

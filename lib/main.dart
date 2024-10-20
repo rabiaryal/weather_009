@@ -2,34 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_009/bloc/weather_bloc.dart'; // Import your WeatherBloc
 
-import 'package:weather_009/models/citymodel.dart';
-import 'package:weather_009/pages/firstpage.dart';
-import 'package:weather_009/widgets/searchwidgets.dart';
+
+import 'package:weather_009/pages/homepages.dart';
+import 'package:weather_009/repository/fetchcountry.dart';
+import 'package:weather_009/repository/weather_repository.dart';
+
 
 
 
 void main() {
   runApp(
     BlocProvider(
-      create: (context) => WeatherBloc(),
+      create: (context) => WeatherBloc(weatherRepository: WeatherRepository(), countryService: CountryService()),
       child: MyApp(), // This could be your root widget
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   
   @override
-   City selectedCity = City(
-      name: 'London',
-      latitude: 51.5074,
-      longitude: -0.1278,
-    );
+  
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Weather App',
-      home:FirstPage(selectedCity: selectedCity) // CitySearchBox widget
+      home:HomePage() // CitySearchBox widget
     );
   }
 }

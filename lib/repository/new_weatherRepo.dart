@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:weather_009/models/weathermode.dart'; // Ensure your model is correctly imported.
 
-class WeatherDetails {
+class WeatherRepository {
   final String apiKey = '70dfe8efe5d56cff4e48055df5b5b8f5'; // Add your API key
-
- 
   final String baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
   Future<WeatherSummary> fetchWeather(double latitude, double longitude) async {
@@ -18,7 +16,7 @@ class WeatherDetails {
         final Map<String, dynamic> body = jsonDecode(response.body);
         print('API Response: $body');
         
-        // Log the response
+        // Return the parsed WeatherSummary object
         return WeatherSummary.fromJson(body);
       } else {
         print('Error fetching weather data: ${response.statusCode}, ${response.body}');

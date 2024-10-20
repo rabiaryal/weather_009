@@ -7,7 +7,7 @@ import 'package:weather_009/pages/widgets/weathertypes.dart';
 class Assignbackground extends StatelessWidget {
   final Weathertypes weatherType;
 
-  const Assignbackground({Key? key, required this.weatherType}) : super(key: key);
+  const Assignbackground({super.key, required this.weatherType});
 
   @override
   Widget build(BuildContext context) {

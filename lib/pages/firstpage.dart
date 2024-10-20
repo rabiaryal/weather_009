@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather_009/res/extensions/enums.dart';
 import 'package:weather_009/models/citymodel.dart';
+import 'package:weather_009/models/countrymodel.dart';
 import 'package:weather_009/pages/widgets/datewidgets.dart';
 import 'package:weather_009/pages/widgets/displayweather.dart';
 import 'package:weather_009/pages/widgets/locationwidget.dart';
@@ -9,11 +9,10 @@ import 'package:weather_009/pages/widgets/popupbutton.dart';
 import 'package:weather_009/pages/widgets/tempreature.dart';
 import 'package:weather_009/pages/widgets/weathertypes.dart';
 import 'package:weather_009/bloc/weather_bloc.dart';
+import 'package:weather_009/res/extensions/enums.dart';
 
 class FirstPage extends StatefulWidget {
-  final City selectedCity;
-
-  const FirstPage({Key? key, required this.selectedCity}) : super(key: key);
+  const FirstPage({super.key});
 
   @override
   State<FirstPage> createState() => _FirstPageState();
@@ -25,12 +24,23 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
-    // Dispatch an event to fetch the weather details when the widget is initialized
-    context
-        .read<WeatherBloc>()
-        .add(FetchWeatherEvent(selectedCity: widget.selectedCity));
-    // context.read<WeatherBloc>().add(FetchCityEvent(query: "Kathmandu"));// Ensure correct event is used
+    // Fetch weather for the selected country
+    _fetchWeatherForSelectedCountry(context);
   }
+
+ void _fetchWeatherForSelectedCountry(BuildContext context) async {
+  // Get the selected country from the WeatherBloc state
+  final selectedCountry = context.read<WeatherBloc>().state.selectedCountry;
+
+  if (selectedCountry != null) {
+    // Dispatch an event to select the country
+    context.read<WeatherBloc>().add(SelectCountryEvent(selectedCountry: selectedCountry));
+
+    // After selecting the country, the weather fetching will be handled in the bloc
+  } else {
+    print("No country selected.");
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +52,9 @@ class _FirstPageState extends State<FirstPage> {
             state.weatherDetails != null) {
           final weather = state.weatherDetails!;
           final temperature = weather.temp;
-          final city = widget.selectedCity.name;
-          final country = widget.selectedCity.country;
+
+          final country =
+              state.selectedCountry?.countryname ?? 'Unknown Country';
 
           return MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -78,8 +89,8 @@ class _FirstPageState extends State<FirstPage> {
                             ],
                           ),
                           const SizedBox(height: 5),
-                          // Display selected location
-                          LocationWidgets(city: city, countryName: country),
+                          LocationWidgets(
+                              city: "Not Required", countryName: country),
                           const SizedBox(height: 10),
                           const DateWidgets(),
                           const SizedBox(height: 10),

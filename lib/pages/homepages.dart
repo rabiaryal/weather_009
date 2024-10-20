@@ -1,136 +1,105 @@
-// import 'package:flutter/material.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:weather_009/bloc/weather_bloc.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:weather_009/extensions/enums.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:weather_009/bloc/weather_bloc.dart';
+import 'package:weather_009/models/countrymodel.dart'; // Import your Country model
+import 'package:weather_009/utils/func/geolocator.dart'; // Import your geolocation methods
+import 'firstpage.dart'; // Import your FirstPage
+import 'package:geocoding/geocoding.dart';
 
-// import 'package:weather_009/models/jsonmodels.dart';
-// import 'package:weather_009/repository/fetchcountry.dart';
-// import 'package:weather_009/repository/weather_repository.dart';
-// import 'package:weather_009/widgets/first_widgets.dart';
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-// class Homepages extends StatefulWidget {
-//   const Homepages({super.key});
-// // 
-//   @override
-//   State<Homepages> createState() => _HomepagesState();
-// }
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
-// class _HomepagesState extends State<Homepages> {
-//   WeatherRepository weatherRepository = WeatherRepository();
-//   Future<WeatherModel>? weatherData;
-//   Position? _defaultPosition;
-//   String locationStatus = "Fetching location...";
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrentLocationAndFetchWeather();
+  }
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     weatherData = null;
-//     initilizeLocation();
-//   }
+  Future<void> _fetchCurrentLocationAndFetchWeather() async {
+    try {
+      Position position = await determinePosition();
+      await _fetchWeatherForLocation(position.latitude, position.longitude);
+    } catch (e) {
+      print("Error fetching current location: $e");
+      // Use default location if unable to fetch current location
+      await _fetchWeatherForDefaultLocation();
+    }
+  }
 
-//   Future<void> initilizeLocation() async {
-//     try {
-//       Position position = await determinePosition();
-//       setState(() {
-//         _defaultPosition = position;
-//         locationStatus =
-//             'Default Location Set: (${position.latitude}, ${position.longitude})';
+  Future<void> _fetchWeatherForLocation(double latitude, double longitude) async {
+    try {
+      // Get the country information from the coordinates
+      Country country = await getCountryFromCoordinates(latitude, longitude);
 
-//         // Fetch weather data using the retrieved coordinates
-//         weatherData = weatherRepository.fetchWeathers(
-          
+      // Dispatch the SelectCountryEvent to update the BLoC state
+      context.read<WeatherBloc>().add(SelectCountryEvent(selectedCountry: country));
 
+      // Navigate to the FirstPage after updating the country
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const FirstPage()),
+      );
+    } catch (e) {
+      print("Error fetching weather for location: $e");
+      // Handle error appropriately, e.g., show a dialog or message to the user
+    }
+  }
 
-//           position.latitude,
-//           position.longitude,
-//         )
-//       });
-//     } catch (e) {
-//       setState(() {
-//         locationStatus = 'Error: $e';
-//       });
-//     }
-//   }
+  Future<void> _fetchWeatherForDefaultLocation() async {
+    // Define a default location (e.g., latitude and longitude for a city)
+    const double defaultLatitude = 27.7172; // Example: Kathmandu
+    const double defaultLongitude = 85.324; // Example: Kathmandu
 
-//   // Function to determine the device's current position
-//   Future<Position> determinePosition() async {
-//     LocationPermission permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.denied) {
-//         throw Exception('Location permissions are denied');
-//       }
-//     }
-//     return await Geolocator.getCurrentPosition();
-//   }
+    // Get the country information for the default location
+    try {
+      Country country = await getCountryFromCoordinates(defaultLatitude, defaultLongitude);
+      context.read<WeatherBloc>().add(SelectCountryEvent(selectedCountry: country));
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocProvider(
-//       create: (context) => WeatherBloc(
-//         countryService: CountryService(),
-//         weatherRepository: WeatherRepository(),
-//       )..add(
-//           const LoadCountry()), // Load the list of countries on initialization
-//       child: Scaffold(
-//         appBar: AppBar(
-//           centerTitle: true,
-//           title: const Text("Weather"),
-//           backgroundColor: Colors.amber,
-//           actions: [
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-//               child: IconButton(
-//                 onPressed: () {
-//                   // Trigger fetching location-based weather
-//                   initilizeLocation();
-//                 },
-//                 icon: const Icon(Icons.add),
-//               ),
-//             ),
-//           ],
-//         ),
-//         body: SingleChildScrollView(
-//           child: Padding(
-//             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 15),
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [
-//                 CountrySearchBox(), // This will use the BLoC to fetch country data and handle selection
-//                 const SizedBox(height: 10),
-//                 BlocBuilder<WeatherBloc, WeatherStates>(
-//                   builder: (context, state) {
-//                     switch (state.postApiStatus) {
-//                       case PostApiStatus.loading:
-//                         return const Center(child: CircularProgressIndicator());
-//                       case PostApiStatus.success:
-//                         if (state.weatherDetails != null) {
-//                           return WidgetsCollection1()
-//                               .BuildWidgets(state.weatherDetails!);
-//                         }
-//                         return const Center(
-//                             child: Text("No Weather Data Available"));
-//                       case PostApiStatus.error:
-//                         return const Center(
-//                             child: Text(
-//                                 "Error fetching weather data, this is form the post Api statues"));
-//                       default:
-//                         return const Center(child: Text("Unknown state"));
-//                     }
-//                   },
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//         floatingActionButton: FloatingActionButton(
-//           onPressed: () {
-//             initilizeLocation();
-//           },
-//           child: const Icon(Icons.refresh_outlined),
-//         ),
-//       ),
-//     );
-//   }
-// }
+      // Navigate to the FirstPage after updating the country
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const FirstPage()),
+      );
+    } catch (e) {
+      print("Error fetching weather for default location: $e");
+      // Handle error appropriately
+    }
+  }
+
+  Future<Country> getCountryFromCoordinates(double latitude, double longitude) async {
+    // Get the list of placemarks from the coordinates
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    
+    // Check if placemarks are available
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks[0]; // Get the first placemark
+      // Create and return a Country object
+      return Country(
+        countryname: placemark.country ?? 'Unknown Country', // Use country or set a default
+        latitude: latitude, // Pass the latitude
+        longitude: longitude, // Pass the longitude
+        flagUrl: 'default_flag_url', // Provide a default URL for flagUrl
+      );
+    } else {
+      throw Exception('No country found for the given coordinates');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Page'),
+      ),
+      body: const Center(
+        child: CircularProgressIndicator(), // Show a loading indicator while fetching location
+      ),
+    );
+  }
+}

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weather_009/pages/widgets/weathertypes.dart';
 
 class Descriptionweathers extends StatelessWidget {
-  const Descriptionweathers({Key? key, required this.weatherType})
-      : super(key: key);
+  const Descriptionweathers({super.key, required this.weatherType});
 
   final Weathertypes weatherType;
 
