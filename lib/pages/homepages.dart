@@ -8,11 +8,10 @@
 // import 'package:weather_009/repository/fetchcountry.dart';
 // import 'package:weather_009/repository/weather_repository.dart';
 // import 'package:weather_009/widgets/first_widgets.dart';
-// import 'package:weather_009/widgets/searchwidgets.dart';
 
 // class Homepages extends StatefulWidget {
 //   const Homepages({super.key});
-
+// // 
 //   @override
 //   State<Homepages> createState() => _HomepagesState();
 // }
@@ -40,9 +39,12 @@
 
 //         // Fetch weather data using the retrieved coordinates
 //         weatherData = weatherRepository.fetchWeathers(
+          
+
+
 //           position.latitude,
 //           position.longitude,
-//         ) as Future<WeatherModel>?;
+//         )
 //       });
 //     } catch (e) {
 //       setState(() {
@@ -66,11 +68,11 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     return BlocProvider(
-      
 //       create: (context) => WeatherBloc(
 //         countryService: CountryService(),
 //         weatherRepository: WeatherRepository(),
-//       )..add(const LoadCountry()), // Load the list of countries on initialization
+//       )..add(
+//           const LoadCountry()), // Load the list of countries on initialization
 //       child: Scaffold(
 //         appBar: AppBar(
 //           centerTitle: true,
@@ -99,21 +101,23 @@
 //                 const SizedBox(height: 10),
 //                 BlocBuilder<WeatherBloc, WeatherStates>(
 //                   builder: (context, state) {
-
-//                      switch (state.postApiStatus) {
-//       case PostApiStatus.loading:
-//         return const Center(child: CircularProgressIndicator());
-//       case PostApiStatus.success:
-//         if (state.weatherDetails != null) {
-//           return WidgetsCollection1().BuildWidgets(state.weatherDetails!);
-//         }
-//         return const Center(child: Text("No Weather Data Available"));
-//       case PostApiStatus.error:
-//         return const Center(child: Text("Error fetching weather data, this is form the post Api statues"));
-//       default:
-//         return const Center(child: Text("Unknown state"));
-//     }
-                    
+//                     switch (state.postApiStatus) {
+//                       case PostApiStatus.loading:
+//                         return const Center(child: CircularProgressIndicator());
+//                       case PostApiStatus.success:
+//                         if (state.weatherDetails != null) {
+//                           return WidgetsCollection1()
+//                               .BuildWidgets(state.weatherDetails!);
+//                         }
+//                         return const Center(
+//                             child: Text("No Weather Data Available"));
+//                       case PostApiStatus.error:
+//                         return const Center(
+//                             child: Text(
+//                                 "Error fetching weather data, this is form the post Api statues"));
+//                       default:
+//                         return const Center(child: Text("Unknown state"));
+//                     }
 //                   },
 //                 ),
 //               ],

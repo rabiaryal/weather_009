@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_009/apptheme/apptheme.dart';
+import 'package:weather_009/res/apptheme/apptheme.dart';
 
 class DateWidgets extends StatelessWidget {
   const DateWidgets({super.key});

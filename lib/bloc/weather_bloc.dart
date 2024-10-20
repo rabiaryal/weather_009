@@ -1,7 +1,7 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:weather_009/extensions/enums.dart';
+import 'package:weather_009/res/extensions/enums.dart';
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/models/weathermode.dart';
 import 'package:weather_009/repository/fetchcitylist.dart';

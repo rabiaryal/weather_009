@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/repository/fetchcitylist.dart';
-import 'package:weather_009/fortest/weatherscreen.dart';
+
 
 class CityDropdown extends StatefulWidget {
   @override
@@ -77,15 +77,15 @@ class _CityDropdownState extends State<CityDropdown> {
                       print(
                           'Selected City: ${selectedCity!.name}, Country: ${selectedCity!.country}');
 
-                      // Navigate to the WeatherScreen and pass latitude & longitude
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => WeatherScreen(
-                            city: selectedCity!,
-                          ),
-                        ),
-                      );
+                      // // Navigate to the WeatherScreen and pass latitude & longitude
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => WeatherScreen(
+                      //       city: selectedCity!,
+                      //     ),
+                      //   ),
+                      // );
                     },
                     child: const Text("Fetch Weather"),
                   )

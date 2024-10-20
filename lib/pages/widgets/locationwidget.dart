@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_009/apptheme/apptheme.dart';
+import 'package:weather_009/res/apptheme/apptheme.dart';
 
 class LocationWidgets extends StatelessWidget {
   final String? city;

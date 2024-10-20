@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_009/bloc/weather_bloc.dart'; // Import your WeatherBloc
-import 'package:weather_009/fortest/page01.dart';
+
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/pages/firstpage.dart';
 
-// void main() {
-//   runApp(const testApp());
-// }
 
-// class testApp extends StatelessWidget {
-//   const testApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const  MaterialApp(
-//       home: NextHome(),
-//     );
-//   }
-// }
 
 void main() {
   runApp(

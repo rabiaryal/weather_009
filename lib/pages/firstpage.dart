@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather_009/extensions/enums.dart';
+import 'package:weather_009/res/extensions/enums.dart';
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/pages/widgets/datewidgets.dart';
 import 'package:weather_009/pages/widgets/displayweather.dart';

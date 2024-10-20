@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:weather_009/bloc/weather_bloc.dart'; // Ensure WeatherBloc is imported
-import 'package:weather_009/extensions/enums.dart';
+import 'package:weather_009/res/extensions/enums.dart';
 import 'package:weather_009/models/citymodel.dart'; // Ensure City model is imported
 
 class CitySearchBox extends StatefulWidget {
