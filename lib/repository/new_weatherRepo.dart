@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:weather_009/models/weathermode.dart'; // Ensure your model is correctly imported.
 
 class WeatherDetails {
-  final String apiKey = '12345'; // Add your API key
+  final String apiKey = '70dfe8efe5d56cff4e48055df5b5b8f5'; // Add your API key
 
  
   final String baseUrl = 'https://api.openweathermap.org/data/2.5/weather';

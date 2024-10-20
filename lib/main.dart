@@ -4,6 +4,7 @@ import 'package:weather_009/bloc/weather_bloc.dart'; // Import your WeatherBloc
 
 import 'package:weather_009/models/citymodel.dart';
 import 'package:weather_009/pages/firstpage.dart';
+import 'package:weather_009/widgets/searchwidgets.dart';
 
 
 
@@ -21,14 +22,14 @@ class MyApp extends StatelessWidget {
   @override
    City selectedCity = City(
       name: 'London',
-      country: 'UK',
       latitude: 51.5074,
       longitude: -0.1278,
     );
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Weather App',
-      home: FirstPage(selectedCity: selectedCity), // CitySearchBox widget
+      home:FirstPage(selectedCity: selectedCity) // CitySearchBox widget
     );
   }
 }
