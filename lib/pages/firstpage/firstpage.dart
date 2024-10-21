@@ -23,7 +23,10 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
-    _fetchInitialLocationOrCity();
+    // Fetch initial data after the widget is fully mounted
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchInitialLocationOrCity();
+    });
   }
 
   Future<void> _fetchInitialLocationOrCity() async {
@@ -35,10 +38,12 @@ class _FirstPageState extends State<FirstPage> {
             longitude: position.longitude,
           );
 
+      // Trigger FetchWeatherEvent using the Bloc
       context.read<WeatherBloc>().add(FetchWeatherEvent(selectedCountry: selectedCountry));
     } catch (e) {
       print('Error fetching location: $e');
-      // Fallback: Fetch weather for a default city (e.g., "New York")
+
+      // If an error occurs, fallback to fetching weather for a default city (e.g., New York)
       context.read<WeatherBloc>().add(FetchWeatherByCityEvent(cityName: 'New York'));
     }
   }
