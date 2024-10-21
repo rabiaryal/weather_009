@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:weather_009/res/apptheme/apptheme.dart';
 
 class LocationWidgets extends StatelessWidget {
-  // final String? city;
+  final String? cityName;
   final String? countryName;
 
-  const LocationWidgets({super.key,  required this.countryName});
+  const LocationWidgets({super.key, this.cityName, required this.countryName});
 
   Widget locationIcon() {
     return const Icon(Icons.location_on, color: Colors.black);
   }
 
-  Widget location( String? countryName) {
+  Widget locationDisplay() {
     return Expanded(
       child: Text(
-        " $countryName",
+        cityName != null && cityName!.isNotEmpty 
+          ? "$cityName, $countryName"
+          : countryName ?? "Unknown Location",
         style: AppTheme.mediumTextStyle,
         overflow: TextOverflow.ellipsis,
       ),
@@ -27,7 +29,7 @@ class LocationWidgets extends StatelessWidget {
       children: [
         locationIcon(),
         const SizedBox(width: 8),
-        location(countryName),
+        locationDisplay(),
       ],
     );
   }

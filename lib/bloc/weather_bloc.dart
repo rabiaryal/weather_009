@@ -21,7 +21,9 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     on<FetchCountryEvent>(_onFetchCountry);
     on<SelectCountryEvent>(_onSelectCountry);
     on<FetchWeatherEvent>(_onFetchWeather);
-    on<RefreshWeatherEvent>(_onRefreshWeather); // Added RefreshWeatherEvent handler
+    on<FetchWeatherByCityEvent>(_onFetchWeatherByCity);
+    on<RefreshWeatherEvent>(_onRefreshWeather);
+    on<SelectCityEvent>(_onSelectCity); // Handle selecting a city
   }
 
   // Fetch countries from the API
@@ -33,8 +35,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
 
     try {
       List<Country> countries = await countryService.fetchCountries();
-      print(
-          "Fetched Countries: ${countries.map((country) => country.countryname).toList()}");
+      print("Fetched Countries: ${countries.map((country) => country.countryname).toList()}");
 
       emit(state.copyWith(
         postApiStatus: PostApiStatus.success,
@@ -58,6 +59,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
 
     emit(state.copyWith(
       selectedCountry: selectedCountry,
+      selectedCity: null, // Reset city when selecting a country
       postApiStatus: PostApiStatus.success,
     ));
 
@@ -65,12 +67,27 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     await _fetchWeatherForCountry(selectedCountry, emit);
   }
 
-  Future<void> _fetchWeatherForCountry(
-      Country selectedCountry, Emitter<WeatherStates> emit) async {
+  // Handle city selection
+  Future<void> _onSelectCity(
+    SelectCityEvent event,
+    Emitter<WeatherStates> emit,
+  ) async {
+    final selectedCity = event.cityName;
+
+    emit(state.copyWith(
+      selectedCity: selectedCity,
+      postApiStatus: PostApiStatus.success,
+    ));
+
+    // Pass the selected city wrapped in a `FetchWeatherByCityEvent`
+    await _onFetchWeatherByCity(FetchWeatherByCityEvent(cityName: selectedCity!), emit);
+  }
+
+  // Fetch weather for a selected country
+  Future<void> _fetchWeatherForCountry(Country selectedCountry, Emitter<WeatherStates> emit) async {
     emit(state.copyWith(postApiStatus: PostApiStatus.loading));
 
     try {
-      // Pass latitude and longitude directly as double
       WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(
         selectedCountry.latitude,
         selectedCountry.longitude,
@@ -89,7 +106,38 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     }
   }
 
-  // Fetch weather using latitude and longitude from the event
+  // Handle refreshing weather for both country and city
+  Future<void> _onRefreshWeather(
+    RefreshWeatherEvent event,
+    Emitter<WeatherStates> emit,
+  ) async {
+    emit(state.copyWith(postApiStatus: PostApiStatus.loading));
+
+    try {
+      if (state.selectedCity != null) {
+        // Refresh weather for the selected city
+        await _onFetchWeatherByCity(
+          FetchWeatherByCityEvent(cityName: state.selectedCity!),
+          emit,
+        );
+      } else if (state.selectedCountry != null) {
+        // Refresh weather for the selected country
+        await _fetchWeatherForCountry(state.selectedCountry!, emit);
+      } else {
+        emit(state.copyWith(
+          postApiStatus: PostApiStatus.error,
+          errorMessage: 'No country or city selected for refresh.',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        postApiStatus: PostApiStatus.error,
+        errorMessage: 'Error refreshing weather: $e',
+      ));
+    }
+  }
+
+  // Handle fetching weather for the selected country
   Future<void> _onFetchWeather(
     FetchWeatherEvent event,
     Emitter<WeatherStates> emit,
@@ -97,11 +145,9 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     emit(state.copyWith(postApiStatus: PostApiStatus.loading));
 
     try {
-      // Check if the event contains valid latitude and longitude
       double latitude = event.selectedCountry.latitude;
       double longitude = event.selectedCountry.longitude;
 
-      // Fetch the weather data using latitude and longitude
       WeatherSummary weatherDetails =
           await weatherRepository.fetchWeathers(latitude, longitude);
 
@@ -118,18 +164,26 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     }
   }
 
-  // Handle refresh event
-  Future<void> _onRefreshWeather(
-    RefreshWeatherEvent event,
+  // Fetch weather by city name
+  Future<void> _onFetchWeatherByCity(
+    FetchWeatherByCityEvent event,
     Emitter<WeatherStates> emit,
   ) async {
-    // Ensure that a country is selected before trying to refresh the weather data
-    if (state.selectedCountry != null) {
-      await _fetchWeatherForCountry(state.selectedCountry!, emit);
-    } else {
+    emit(state.copyWith(postApiStatus: PostApiStatus.loading));
+
+    try {
+      WeatherSummary weatherDetails =
+          await weatherRepository.fetchWeatherByCityName(event.cityName);
+
+      emit(state.copyWith(
+        weatherDetails: weatherDetails,
+        postApiStatus: PostApiStatus.success,
+      ));
+    } catch (e) {
+      print('Error fetching weather by city: $e');
       emit(state.copyWith(
         postApiStatus: PostApiStatus.error,
-        errorMessage: 'No country selected for refresh.',
+        errorMessage: 'Error fetching weather by city: $e',
       ));
     }
   }

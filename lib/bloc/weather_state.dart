@@ -3,8 +3,9 @@ part of 'weather_bloc.dart';
 
 class WeatherStates extends Equatable {
   final PostApiStatus postApiStatus;
-  final List<Country>? countries; // Add a list of countries
-  final Country? selectedCountry; // Store selected country
+  final List<Country>? countries;
+  final Country? selectedCountry;
+  final String? selectedCity; // Add this line
   final WeatherSummary? weatherDetails;
   final String? errorMessage;
 
@@ -12,6 +13,7 @@ class WeatherStates extends Equatable {
     this.postApiStatus = PostApiStatus.initial,
     this.countries,
     this.selectedCountry,
+    this.selectedCity, // Add this line
     this.weatherDetails,
     this.errorMessage,
   });
@@ -20,6 +22,7 @@ class WeatherStates extends Equatable {
     PostApiStatus? postApiStatus,
     List<Country>? countries,
     Country? selectedCountry,
+    String? selectedCity, // Add this line
     WeatherSummary? weatherDetails,
     String? errorMessage,
   }) {
@@ -27,11 +30,12 @@ class WeatherStates extends Equatable {
       postApiStatus: postApiStatus ?? this.postApiStatus,
       countries: countries ?? this.countries,
       selectedCountry: selectedCountry ?? this.selectedCountry,
+      selectedCity: selectedCity ?? this.selectedCity, // Add this line
       weatherDetails: weatherDetails ?? this.weatherDetails,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [postApiStatus, countries, selectedCountry, weatherDetails, errorMessage];
+  List<Object?> get props => [postApiStatus, countries, selectedCountry, selectedCity, weatherDetails, errorMessage]; // Add selectedCity
 }

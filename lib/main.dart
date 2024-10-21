@@ -3,17 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_009/bloc/weather_bloc.dart'; // Import your WeatherBloc
 
 
-import 'package:weather_009/pages/homepages.dart';
+
 import 'package:weather_009/repository/fetchcountry.dart';
 import 'package:weather_009/repository/weather_repository.dart';
-
-
-
+import 'package:weather_009/route/route_name.dart';
+import 'package:weather_009/route/routes.dart';
 
 void main() {
   runApp(
     BlocProvider(
-      create: (context) => WeatherBloc(weatherRepository: WeatherRepository(), countryService: CountryService()),
+      create: (context) => WeatherBloc(
+          weatherRepository: WeatherRepository(),
+          countryService: CountryService()),
       child: MyApp(), // This could be your root widget
     ),
   );
@@ -22,15 +23,16 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  
   @override
-  
   Widget build(BuildContext context) {
     return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Weather App',
-      home:HomePage() // CitySearchBox widget
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Weather App',
+
+        initialRoute: RouteName.first,
+        onGenerateRoute: Routes.generateRoute,
+       // CitySearchBox widget
+        );
   }
 }
 

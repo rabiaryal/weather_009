@@ -1,22 +1,27 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:weather_009/pages/firstpage/firstpage.dart';
+import 'package:weather_009/route/route_name.dart';
+import 'package:weather_009/widgets/dialog.dart';
+import 'package:weather_009/pages/search/searchwidgets.dart';
+
 
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings setting) {
     switch (setting.name) {
-      // case RouteName.home:
-      //   return MaterialPageRoute(
-      //       builder: (BuildContext context) => const HomeScreen());
+      case RouteName.first:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => const FirstPage());
 
-      // case RouteName.login:
-      //   return MaterialPageRoute(
-      //       builder: (BuildContext context) => const LoginScreen());
+      case RouteName.searchcountry:
+        return MaterialPageRoute(
+            builder: (BuildContext context) =>const  CitySearchBox());
       
 
-      // case RouteName.signUp:
-      //   return MaterialPageRoute(
-      //       builder: (BuildContext context) => const SignUpView());
+      case RouteName.dialog:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => const SecondDialog());
 
 
       //   case RouteName.splash:
