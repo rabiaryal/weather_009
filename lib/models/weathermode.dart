@@ -1,3 +1,7 @@
+import 'package:weather_009/pages/widgets/weathertypes.dart';
+
+ // Import the Weathertypes enum
+
 class WeatherSummary {
   final double temp; // Current temperature
   final double tempMax; // Maximum temperature
@@ -7,47 +11,81 @@ class WeatherSummary {
   final double? windSpeed; // Wind speed (optional)
   final int utcTime; // UTC time (Unix timestamp)
   final int timezoneOffset; // Timezone offset in seconds
+  final Weathertypes weatherType; // Weather type (added field)
 
   WeatherSummary({
     required this.temp,
     required this.tempMax,
     required this.tempMin,
     required this.feelsLike,
-    this.humidity, // humidity is optional and can be null
-    this.windSpeed, // windSpeed is optional and can be null
-    required this.utcTime, // Required UTC time
-    required this.timezoneOffset, // Required timezone offset
+    this.humidity,
+    this.windSpeed,
+    required this.utcTime,
+    required this.timezoneOffset,
+    required this.weatherType, // Required weather type
   });
 
   // Factory constructor to create an instance from JSON, with null checks
   factory WeatherSummary.fromJson(Map<String, dynamic> json) {
     return WeatherSummary(
-      temp: (json['main']['temp'] as num?)?.toDouble() ?? 0.0, // Ensure temp is double, default to 0.0 if null
-      tempMax: (json['main']['temp_max'] as num?)?.toDouble() ?? 0.0, // Ensure tempMax is double, default to 0.0
-      tempMin: (json['main']['temp_min'] as num?)?.toDouble() ?? 0.0, // Ensure tempMin is double, default to 0.0
-      feelsLike: (json['main']['feels_like'] as num?)?.toDouble() ?? 0.0, // Ensure feelsLike is double, default to 0.0
-      humidity: json['main']['humidity'] != null ? (json['main']['humidity'] as int) : null, // Make humidity nullable
+      temp: (json['main']['temp'] as num?)?.toDouble() ?? 0.0,
+      tempMax: (json['main']['temp_max'] as num?)?.toDouble() ?? 0.0,
+      tempMin: (json['main']['temp_min'] as num?)?.toDouble() ?? 0.0,
+      feelsLike: (json['main']['feels_like'] as num?)?.toDouble() ?? 0.0,
+      humidity: json['main']['humidity'] != null ? (json['main']['humidity'] as int) : null,
       windSpeed: json['wind'] != null && json['wind']['speed'] != null
-          ? (json['wind']['speed'] as num?)?.toDouble() // Ensure wind speed is double, handle null
+          ? (json['wind']['speed'] as num?)?.toDouble()
           : null,
-      utcTime: json['dt'] as int, // Unix timestamp for UTC time
-      timezoneOffset: json['timezone'] as int, // Timezone offset in seconds
+      utcTime: json['dt'] as int,
+      timezoneOffset: json['timezone'] as int,
+      weatherType: _mapWeatherConditionToType(json['weather']?[0]['main'] as String?), // Map weather type
     );
   }
 
   // Method to convert the instance to JSON
   Map<String, dynamic> toJson() {
     return {
-      'temp': temp,
-      'temp_max': tempMax,
-      'temp_min': tempMin,
-      'feels_like': feelsLike,
-      'humidity': humidity,
+      'main': {
+        'temp': temp,
+        'temp_max': tempMax,
+        'temp_min': tempMin,
+        'feels_like': feelsLike,
+        'humidity': humidity,
+      },
       'wind': {
         'speed': windSpeed,
       },
-      'dt': utcTime, // Add UTC time to JSON
-      'timezone': timezoneOffset, // Add timezone offset to JSON
+      'dt': utcTime,
+      'timezone': timezoneOffset,
+      'weather': [
+        {
+          'main': weatherType.name, // Convert weatherType back to string for JSON
+        }
+      ],
     };
+  }
+
+  // Helper method to map weather condition strings from the API to Weathertypes enum
+  static Weathertypes _mapWeatherConditionToType(String? weatherCondition) {
+    switch (weatherCondition?.toLowerCase()) {
+      case 'clear':
+        return Weathertypes.sunny;
+      case 'clouds':
+        return Weathertypes.cloudy;
+      case 'rain':
+      case 'drizzle':
+        return Weathertypes.rain;
+      case 'snow':
+        return Weathertypes.snow;
+      case 'fog':
+      case 'mist':
+        return Weathertypes.fog;
+      case 'thunderstorm':
+        return Weathertypes.thunderstorm;
+      case 'wind':
+        return Weathertypes.wind;
+      default:
+        return Weathertypes.cloudy; // Default case for unknown weather types
+    }
   }
 }

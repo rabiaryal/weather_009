@@ -13,7 +13,11 @@ class Descriptionweathers extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade100,
+        
+        color:
+
+        
+         weatherType.getBackgroundColor(), // Use the new background color method
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
@@ -21,15 +25,14 @@ class Descriptionweathers extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
-            weatherType.getIcon(), // Get the icon based on the weather type
+            weatherType.getIcon(), // Use the new getIcon method
             size: 40,
             color: Colors.black,
           ),
           const SizedBox(width: 10), // Space between icon and text
           Flexible(
             child: Text(
-              weatherType
-                  .getDescription(), // Get the description based on the weather type
+              weatherType.getDescription(), // Use the new getDescription method
               style: const TextStyle(fontSize: 16),
               maxLines: 2, // Maximum number of lines the text can take
               overflow: TextOverflow.ellipsis, // Shows "..." if it overflows

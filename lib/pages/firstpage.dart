@@ -20,7 +20,7 @@ class FirstPage extends StatefulWidget {
 }
 
 class _FirstPageState extends State<FirstPage> {
-  Weathertypes currentWeather = Weathertypes.snow;
+  Weathertypes currentWeather = Weathertypes.cloudy;
 
   @override
   void initState() {
@@ -53,99 +53,96 @@ class _FirstPageState extends State<FirstPage> {
   }
 
   @override
-  
-Widget build(BuildContext context) {
-  return BlocBuilder<WeatherBloc, WeatherStates>(
-    builder: (context, state) {
-      if (state.postApiStatus == PostApiStatus.loading) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state.postApiStatus == PostApiStatus.success && state.weatherDetails != null) {
-        final weather = state.weatherDetails!;
-        final temperature = weather.temp;
-        final country = state.selectedCountry?.countryname ?? 'Unknown Country';
-        final utcTime = weather.utcTime; 
-        
-        // Ensure you have the correct property name
-        final timezoneOffset = weather.timezoneOffset; 
-        
-        
-        
+  Widget build(BuildContext context) {
+    return BlocBuilder<WeatherBloc, WeatherStates>(
+      builder: (context, state) {
+        if (state.postApiStatus == PostApiStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state.postApiStatus == PostApiStatus.success && state.weatherDetails != null) {
+          final weather = state.weatherDetails!;
+          final temperature = weather.temp;
+          final country = state.selectedCountry?.countryname ?? 'Unknown Country';
+          final utcTime = weather.utcTime; 
+          final timezoneOffset = weather.timezoneOffset; 
+
+          // Update the currentWeather type based on the fetched weather details
+          currentWeather = weather.weatherType;
+
           final DateTime utcDateTime = DateTime.fromMillisecondsSinceEpoch(
               utcTime * 1000,
-              isUtc: true); // Ensure you have the correct property name
+              isUtc: true);
 
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: Scaffold(
-            extendBodyBehindAppBar: true,
-            body: RefreshIndicator(
-              onRefresh: () async {
-                // Trigger the refresh event
-                context.read<WeatherBloc>().add(RefreshWeatherEvent());
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    color: currentWeather.getBackgroundColor(),
-                  ),
-                  SafeArea(
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(), // Ensure scrolling always works
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    showPopupMenu(context);
-                                  },
-                                  icon: const Icon(Icons.more_vert, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            LocationWidgets(countryName: country),
-                            const SizedBox(height: 10),
-                            DateWidgets(
-                              utcTime: utcDateTime, // Pass UTC time
-                              timezoneOffset: timezoneOffset, // Pass timezone offset
-                            ),
-                            const SizedBox(height: 10),
-                            TemperatureWidgets(temperature: temperature),
-                            const SizedBox(height: 10),
-                            Descriptionweathers(weatherType: currentWeather),
-                          ],
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: Scaffold(
+              extendBodyBehindAppBar: true,
+              body: RefreshIndicator(
+                onRefresh: () async {
+                  // Trigger the refresh event
+                  context.read<WeatherBloc>().add(RefreshWeatherEvent());
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      color: Colors.blue.shade100,
+                      
+                      // currentWeather.getBackgroundColor(), // Set background color dynamically
+                    ),
+                    SafeArea(
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(), // Ensure scrolling always works
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      showPopupMenu(context);
+                                    },
+                                    icon: const Icon(Icons.more_vert, color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              LocationWidgets(countryName: country),
+                              const SizedBox(height: 10),
+                              DateWidgets(
+                                utcTime: utcDateTime, // Pass UTC time
+                                timezoneOffset: timezoneOffset, // Pass timezone offset
+                              ),
+                              const SizedBox(height: 10),
+                              TemperatureWidgets(temperature: temperature),
+                              const SizedBox(height: 10),
+                              Descriptionweathers(weatherType: currentWeather), // Update description dynamically
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      } else if (state.postApiStatus == PostApiStatus.error) {
-        return Center(child: Text('Error: ${state.errorMessage}'));
-      } else {
-        return const Center(child: Text('No data available.'));
-      }
-    },
-  );
+          );
+        } else if (state.postApiStatus == PostApiStatus.error) {
+          return Center(child: Text('Error: ${state.errorMessage}'));
+        } else {
+          return const Center(child: Text('No data available.'));
+        }
+      },
+    );
+  }
 }
 
-
-  
-
-}
 
 
 // Widget build(BuildContext context) {
