@@ -3,15 +3,25 @@ import 'package:intl/intl.dart';
 import 'package:weather_009/res/apptheme/apptheme.dart';
 
 class DateWidgets extends StatelessWidget {
-  const DateWidgets({super.key});
-  String getCurrentDateTime() {
-    // Get current date and time
-    DateTime now = DateTime.now();
 
-    // Format date and time
-    String formattedDate =
-        DateFormat('EEEE, MMM d,').format(now); // Example: Friday, Oct 6, 2023
-    String formattedTime = DateFormat('h:mm a').format(now); // Example: 5:12 PM
+  final DateTime utcTime;
+  // UTC time (from the API)
+  final int timezoneOffset; // Timezone offset in seconds
+
+  const DateWidgets({
+    Key? key,
+    required this.utcTime,
+    required this.timezoneOffset,
+  }) : super(key: key);
+
+  // Function to calculate local time based on UTC and timezone offset
+  String getLocalDateTime() {
+    // Convert the UTC time to local time based on timezone offset
+    DateTime localTime = utcTime.add(Duration(seconds: timezoneOffset));
+
+    // Format date and time for the selected country
+    String formattedDate = DateFormat('EEEE, MMM d,').format(localTime); // Example: Friday, Oct 6, 2023
+    String formattedTime = DateFormat('h:mm a').format(localTime); // Example: 5:12 PM
 
     return "$formattedDate $formattedTime";
   }
@@ -19,7 +29,7 @@ class DateWidgets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      getCurrentDateTime(),
+      getLocalDateTime(),
       style: AppTheme.mediumTextStyle,
     );
   }

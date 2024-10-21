@@ -5,6 +5,8 @@ class WeatherSummary {
   final double feelsLike; // Feels like temperature
   final int? humidity; // Humidity (optional)
   final double? windSpeed; // Wind speed (optional)
+  final int utcTime; // UTC time (Unix timestamp)
+  final int timezoneOffset; // Timezone offset in seconds
 
   WeatherSummary({
     required this.temp,
@@ -13,6 +15,8 @@ class WeatherSummary {
     required this.feelsLike,
     this.humidity, // humidity is optional and can be null
     this.windSpeed, // windSpeed is optional and can be null
+    required this.utcTime, // Required UTC time
+    required this.timezoneOffset, // Required timezone offset
   });
 
   // Factory constructor to create an instance from JSON, with null checks
@@ -26,6 +30,8 @@ class WeatherSummary {
       windSpeed: json['wind'] != null && json['wind']['speed'] != null
           ? (json['wind']['speed'] as num?)?.toDouble() // Ensure wind speed is double, handle null
           : null,
+      utcTime: json['dt'] as int, // Unix timestamp for UTC time
+      timezoneOffset: json['timezone'] as int, // Timezone offset in seconds
     );
   }
 
@@ -40,6 +46,8 @@ class WeatherSummary {
       'wind': {
         'speed': windSpeed,
       },
+      'dt': utcTime, // Add UTC time to JSON
+      'timezone': timezoneOffset, // Add timezone offset to JSON
     };
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_009/models/countrymodel.dart';
-
 import 'package:weather_009/pages/widgets/datewidgets.dart';
 import 'package:weather_009/pages/widgets/displayweather.dart';
 import 'package:weather_009/pages/widgets/locationwidget.dart';
@@ -26,31 +25,27 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
-    
     _fetchInitialLocationAndWeather();
   }
 
-Future<void> _fetchInitialLocationAndWeather() async {
-  try {
-    // Get the user's current position
-    Position position = await determinePosition();
-    
-    // Fetch the closest country using latitude and longitude
-    Country selectedCountry = await context.read<WeatherBloc>().countryService.fetchCountryByLatLong(
-      latitude: position.latitude,
-      longitude: position.longitude,
-    );
+  Future<void> _fetchInitialLocationAndWeather() async {
+    try {
+      // Get the user's current position
+      Position position = await determinePosition();
+      
+      // Fetch the closest country using latitude and longitude
+      Country selectedCountry = await context.read<WeatherBloc>().countryService.fetchCountryByLatLong(
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
 
-    // Dispatch the FetchWeatherEvent with the selected country
-    context.read<WeatherBloc>().add(FetchWeatherEvent(selectedCountry: selectedCountry));
-
-  } catch (e) {
-    print('Error fetching location or country: $e');
-    // Handle error appropriately, e.g., show a dialog or message to the user
+      // Dispatch the FetchWeatherEvent with the selected country
+      context.read<WeatherBloc>().add(FetchWeatherEvent(selectedCountry: selectedCountry));
+    } catch (e) {
+      print('Error fetching location or country: $e');
+      // Handle error appropriately, e.g., show a dialog or message to the user
+    }
   }
-}
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +53,14 @@ Future<void> _fetchInitialLocationAndWeather() async {
       builder: (context, state) {
         if (state.postApiStatus == PostApiStatus.loading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state.postApiStatus == PostApiStatus.success &&
-            state.weatherDetails != null) {
+        } else if (state.postApiStatus == PostApiStatus.success && state.weatherDetails != null) {
           final weather = state.weatherDetails!;
           final temperature = weather.temp;
           final country = state.selectedCountry?.countryname ?? 'Unknown Country';
+          
+          final utcTime = weather.utcTime; // Ensure you have the correct property name
+          final timezoneOffset = weather.timezoneOffset;
+          final DateTime utcDateTime = DateTime.fromMillisecondsSinceEpoch(utcTime * 1000, isUtc: true); // Ensure you have the correct property name
 
           return MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -91,15 +89,18 @@ Future<void> _fetchInitialLocationAndWeather() async {
                                 onPressed: () {
                                   showPopupMenu(context);
                                 },
-                                icon: const Icon(Icons.more_vert,
-                                    color: Colors.black),
+                                icon: const Icon(Icons.more_vert, color: Colors.black),
                               ),
                             ],
                           ),
                           const SizedBox(height: 5),
-                          LocationWidgets(city: "Not Required", countryName: country),
+                          LocationWidgets(countryName: country),
                           const SizedBox(height: 10),
-                          const DateWidgets(),
+                          DateWidgets(
+                             utcTime: utcDateTime,
+                            // Pass UTC time
+                            timezoneOffset: timezoneOffset, // Pass timezone offset
+                          ),
                           const SizedBox(height: 10),
                           TemperatureWidgets(temperature: temperature),
                           const SizedBox(height: 10),
