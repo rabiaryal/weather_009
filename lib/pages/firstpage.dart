@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather_009/models/citymodel.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:weather_009/models/countrymodel.dart';
+
 import 'package:weather_009/pages/widgets/datewidgets.dart';
 import 'package:weather_009/pages/widgets/displayweather.dart';
 import 'package:weather_009/pages/widgets/locationwidget.dart';
@@ -10,6 +11,7 @@ import 'package:weather_009/pages/widgets/tempreature.dart';
 import 'package:weather_009/pages/widgets/weathertypes.dart';
 import 'package:weather_009/bloc/weather_bloc.dart';
 import 'package:weather_009/res/extensions/enums.dart';
+import 'package:weather_009/utils/func/geolocator.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({super.key});
@@ -24,23 +26,31 @@ class _FirstPageState extends State<FirstPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch weather for the selected country
-    _fetchWeatherForSelectedCountry(context);
+    
+    _fetchInitialLocationAndWeather();
   }
 
- void _fetchWeatherForSelectedCountry(BuildContext context) async {
-  // Get the selected country from the WeatherBloc state
-  final selectedCountry = context.read<WeatherBloc>().state.selectedCountry;
+Future<void> _fetchInitialLocationAndWeather() async {
+  try {
+    // Get the user's current position
+    Position position = await determinePosition();
+    
+    // Fetch the closest country using latitude and longitude
+    Country selectedCountry = await context.read<WeatherBloc>().countryService.fetchCountryByLatLong(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
 
-  if (selectedCountry != null) {
-    // Dispatch an event to select the country
-    context.read<WeatherBloc>().add(SelectCountryEvent(selectedCountry: selectedCountry));
+    // Dispatch the FetchWeatherEvent with the selected country
+    context.read<WeatherBloc>().add(FetchWeatherEvent(selectedCountry: selectedCountry));
 
-    // After selecting the country, the weather fetching will be handled in the bloc
-  } else {
-    print("No country selected.");
+  } catch (e) {
+    print('Error fetching location or country: $e');
+    // Handle error appropriately, e.g., show a dialog or message to the user
   }
 }
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +62,7 @@ class _FirstPageState extends State<FirstPage> {
             state.weatherDetails != null) {
           final weather = state.weatherDetails!;
           final temperature = weather.temp;
-
-          final country =
-              state.selectedCountry?.countryname ?? 'Unknown Country';
+          final country = state.selectedCountry?.countryname ?? 'Unknown Country';
 
           return MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -89,8 +97,7 @@ class _FirstPageState extends State<FirstPage> {
                             ],
                           ),
                           const SizedBox(height: 5),
-                          LocationWidgets(
-                              city: "Not Required", countryName: country),
+                          LocationWidgets(city: "Not Required", countryName: country),
                           const SizedBox(height: 10),
                           const DateWidgets(),
                           const SizedBox(height: 10),
@@ -105,6 +112,8 @@ class _FirstPageState extends State<FirstPage> {
               ),
             ),
           );
+        } else if (state.postApiStatus == PostApiStatus.error) {
+          return Center(child: Text('Error: ${state.errorMessage}'));
         } else {
           return const Center(child: Text('No data available.'));
         }

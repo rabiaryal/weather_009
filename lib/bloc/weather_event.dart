@@ -26,12 +26,13 @@ class SelectCountryEvent extends WeatherEvent {
 }
 
 // Event to fetch weather based on the selected country's coordinates
-class FetchWeatherEvent extends WeatherEvent {
-  final double latitude;  // Use latitude as a double
-  final double longitude; // Use longitude as a double
 
-  const FetchWeatherEvent({required this.latitude, required this.longitude});
+
+class FetchWeatherEvent extends WeatherEvent {
+  final Country selectedCountry;
+
+  const FetchWeatherEvent({required this.selectedCountry});
 
   @override
-  List<Object?> get props => [latitude, longitude];
+  List<Object?> get props => [selectedCountry];
 }

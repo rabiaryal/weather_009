@@ -63,14 +63,14 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     await _fetchWeatherForCountry(selectedCountry, emit);
   }
 
-  // Fetch weather based on selected country's latitude and longitude
+ 
   Future<void> _fetchWeatherForCountry(Country selectedCountry, Emitter<WeatherStates> emit) async {
     emit(state.copyWith(postApiStatus: PostApiStatus.loading));
 
     try {
       // Pass latitude and longitude directly as double
       WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(
-        selectedCountry.latitude,
+         selectedCountry.latitude,
         selectedCountry.longitude,
       );
       
@@ -95,11 +95,14 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherStates> {
     emit(state.copyWith(postApiStatus: PostApiStatus.loading));
 
     try {
-      WeatherSummary weatherDetails = await weatherRepository.fetchWeathers(
-        event.latitude.toString(),
-        event.longitude,
-      );
+      // Check if the event contains valid latitude and longitude
+      double latitude = event.selectedCountry.latitude;
+      double longitude = event.selectedCountry.longitude;
 
+      // Fetch the weather data using latitude and longitude
+      WeatherSummary weatherDetails =
+          await weatherRepository.fetchWeathers(latitude, longitude);
+      
       emit(state.copyWith(
         weatherDetails: weatherDetails,
         postApiStatus: PostApiStatus.success,

@@ -11,7 +11,7 @@ class Country {
     required this.flagUrl,
   });
 
-  factory Country.fromJson(Map<String, dynamic> json) {
+  factory Country.fromJson(Map<dynamic, dynamic> json) {
     return Country(
   countryname: json['name']['common'],
       // Explicitly convert to double if the values are returned as int

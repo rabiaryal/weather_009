@@ -5,14 +5,10 @@ import 'package:http/http.dart' as http;
 class WeatherRepository {
   final String apiKey = '70dfe8efe5d56cff4e48055df5b5b8f5'; // Add your API key
 
-  Future<WeatherSummary> fetchWeathers(String cityName, double longitude) async {
-    if (cityName.isEmpty) {
-      throw Exception('City name is required');
-    }
+  // Method to fetch weather data using latitude and longitude
+  Future<WeatherSummary> fetchWeathers(double latitude, double longitude) async {
     final String weatherUrl =
-
-   
-        'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey&units=metric';
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric';
 
     final response = await http.get(Uri.parse(weatherUrl));
 
