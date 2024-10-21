@@ -6,6 +6,12 @@ abstract class WeatherEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }
+// Add this event to the WeatherEvent class
+class RefreshWeatherEvent extends WeatherEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 
 // Event to fetch countries
 class FetchCountryEvent extends WeatherEvent {
